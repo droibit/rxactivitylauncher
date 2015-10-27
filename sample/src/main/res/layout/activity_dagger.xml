@@ -20,6 +20,7 @@
     <android.support.v7.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Dagger Activity"
-        android:onClick="startDaggerActivity" />
+        android:text="Cancel"
+        android:onClick="cancel" />
+
 </LinearLayout>

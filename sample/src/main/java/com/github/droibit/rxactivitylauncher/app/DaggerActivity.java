@@ -1,30 +1,38 @@
 package com.github.droibit.rxactivitylauncher.app;
 
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
 import com.github.droibit.rxactivitylauncher.RxLauncher;
+import com.github.droibit.rxactivitylauncher.app.dagger.ActivityComponent;
+import com.github.droibit.rxactivitylauncher.app.dagger.ActivityModule;
+import com.github.droibit.rxactivitylauncher.app.dagger.DaggerActivityComponent;
+
+import javax.inject.Inject;
 
 import rx.functions.Action1;
 
-/**
- * @author kumagai
- */
-public class MainActivity extends AppCompatActivity {
+public class DaggerActivity extends AppCompatActivity {
 
-    private RxLauncher mLauncher;
+    public static Intent launchIntent(Context context) {
+        return new Intent(context, DaggerActivity.class);
+    }
+
+    @Inject
+    RxLauncher mLauncher;
 
     /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dagger);
 
-        mLauncher = RxLauncher.from(this);
+        component().inject(this);
     }
 
     /** {@inheritDoc} */
@@ -37,21 +45,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void startDetailActivity(View v) {
         final Intent intent = DetailActivity.launchIntent(this);
-        launchActivity(intent);
-    }
-
-    public void startDaggerActivity(View v) {
-        final Intent intent = DaggerActivity.launchIntent(this);
-        launchActivity(intent);
-    }
-
-    private void launchActivity(Intent intent) {
         mLauncher.startActivityForResult(intent, DetailActivity.REQUEST_DETAIL)
                 .subscribe(new Action1<ActivityResult>() {
                     @Override public void call(ActivityResult result) {
                         final String msg = result.isOk() ? "OK" : "Canceled";
-                        Toast.makeText(MainActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    public void cancel(View v) {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    public ActivityComponent component() {
+        return DaggerActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .build();
     }
 }
