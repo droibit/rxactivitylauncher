@@ -86,7 +86,6 @@ public class RxLauncher {
         try {
             mDelegate.startActivityForResult(intent, requestCode, options);
         } catch (ActivityNotFoundException | SecurityException e) {
-            Log.e(TAG, "Error: ", e);
             return Observable.error(e);
         }
         return makeSubject(requestCode);
@@ -103,7 +102,7 @@ public class RxLauncher {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         final PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
         if (subject == null) {
-            throw new IllegalStateException("");
+            throw new IllegalStateException();
         }
         subject.onNext(new ActivityResult(resultCode, data));
         subject.onCompleted();

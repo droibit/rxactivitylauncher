@@ -26,4 +26,23 @@ public class ActivityResult {
     public boolean isCanceled() {
         return resultCode == Activity.RESULT_CANCELED;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ActivityResult)) return false;
+
+        ActivityResult that = (ActivityResult) o;
+
+        if (resultCode != that.resultCode) return false;
+        return !(data != null ? !data.equals(that.data) : that.data != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = resultCode;
+        result = 31 * result + (data != null ? data.hashCode() : 0);
+        return result;
+    }
 }
