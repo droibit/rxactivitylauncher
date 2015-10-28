@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
 import com.github.droibit.rxactivitylauncher.RxLauncher;
+import com.github.droibit.rxactivitylauncher.app.controller.DaggerController;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityComponent;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityModule;
 import com.github.droibit.rxactivitylauncher.app.dagger.DaggerActivityComponent;
@@ -17,6 +18,9 @@ import javax.inject.Inject;
 
 import rx.functions.Action1;
 
+/**
+ * @author kumagai
+ */
 public class DaggerActivity extends AppCompatActivity {
 
     public static Intent launchIntent(Context context) {
@@ -25,6 +29,9 @@ public class DaggerActivity extends AppCompatActivity {
 
     @Inject
     RxLauncher mLauncher;
+
+    @Inject
+    DaggerController mController;
 
     /** {@inheritDoc} */
     @Override
@@ -52,6 +59,10 @@ public class DaggerActivity extends AppCompatActivity {
                         Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    public void startDetailActivityByController(View v) {
+        mController.startDetailActivity();
     }
 
     public void cancel(View v) {

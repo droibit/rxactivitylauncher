@@ -3,6 +3,7 @@ package com.github.droibit.rxactivitylauncher;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -18,6 +19,7 @@ import rx.observers.TestSubscriber;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -32,7 +34,7 @@ public class RxLauncherTest {
     private static final int RESULT_FIRST_USER = 1;
 
     @Mock
-    Intent launchIntent;
+    Intent mLaunchIntent;
 
     @Before
     public void setup() {
@@ -45,9 +47,8 @@ public class RxLauncherTest {
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
         final RxLauncher launcher = RxLauncher.from(activity);
-
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(launchIntent, REQUEST_TEST)
+        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_OK, null);
@@ -63,10 +64,12 @@ public class RxLauncherTest {
         final Fragment fragment = mock(Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final Activity activity = mock(Activity.class);
+        doReturn(activity).when(fragment).getActivity();
 
+        final RxLauncher launcher = RxLauncher.from(fragment);
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(launchIntent, REQUEST_TEST)
+        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
@@ -82,10 +85,12 @@ public class RxLauncherTest {
         final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final Context context = mock(Context.class);
+        doReturn(context).when(fragment).getContext();
 
+        final RxLauncher launcher = RxLauncher.from(fragment);
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(launchIntent, REQUEST_TEST)
+        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
@@ -105,7 +110,7 @@ public class RxLauncherTest {
         final RxLauncher launcher = RxLauncher.from(activity);
 
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(launchIntent, REQUEST_TEST)
+        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertError(ane);
@@ -121,7 +126,7 @@ public class RxLauncherTest {
         final RxLauncher launcher = RxLauncher.from(activity);
 
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(launchIntent, REQUEST_TEST)
+        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertError(SecurityException.class);

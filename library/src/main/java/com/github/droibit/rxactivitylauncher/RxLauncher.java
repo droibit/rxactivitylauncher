@@ -3,6 +3,7 @@ package com.github.droibit.rxactivitylauncher;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,38 +30,43 @@ import rx.subjects.PublishSubject;
 public class RxLauncher {
 
     /**
-     * Make {@link RxLauncher} to launch from the {@link Activity}.
+     * Make {@link RxLauncher} to launch from the {@link Activity}.<br/>
+     * {@link #getContext()} will return context is {@link Activity}.
      *
      * @param activity Source {@link Activity}
      */
     public static RxLauncher from(@NonNull Activity activity) {
-        return new RxLauncher(new Launchers.SourceActivity(activity));
+        return new RxLauncher(activity, new Launchers.SourceActivity(activity));
     }
 
     /**
      * Make {@link RxLauncher} to launch from the {@link Fragment}.
+     * {@link #getContext()} will return context is {@link Fragment#getActivity()}.
      *
      * @param fragment Source {@link Fragment}
      */
     public static RxLauncher from(@NonNull Fragment fragment) {
-        return new RxLauncher(new Launchers.SourceFragment(fragment));
+        return new RxLauncher(fragment.getActivity(), new Launchers.SourceFragment(fragment));
     }
 
     /**
      * Make {@link RxLauncher} to launch from the {@link android.support.v4.app.Fragment}.
+     * {@link #getContext()} will return context is {@link android.support.v4.app.Fragment#getContext()}.
      *
      * @param fragment Source {@link android.support.v4.app.Fragment}
      */
     public static RxLauncher from(@NonNull android.support.v4.app.Fragment fragment) {
-        return new RxLauncher(new Launchers.SourceSupportFragment(fragment));
+        return new RxLauncher(fragment.getContext(), new Launchers.SourceSupportFragment(fragment));
     }
 
     private static final String TAG = RxLauncher.class.getSimpleName();
 
     private final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
     private final Launchable mDelegate;
+    private final Context mContext;
 
-    RxLauncher(Launchable delegate) {
+    RxLauncher(Context context, Launchable delegate) {
+        mContext = context;
         mSubjects = new HashMap<>(5);
         mDelegate = delegate;
     }
@@ -108,6 +114,13 @@ public class RxLauncher {
         subject.onCompleted();
 
         mSubjects.remove(requestCode);
+    }
+
+    /**
+     * Get the context in which the activity of start-up source.
+     */
+    public Context getContext() {
+        return mContext;
     }
 
     private Observable<ActivityResult> makeSubject(int requestCode) {

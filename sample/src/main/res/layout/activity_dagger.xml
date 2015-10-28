@@ -20,6 +20,12 @@
     <android.support.v7.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Start Detail Activity By Controller"
+        android:onClick="startDetailActivityByController" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Cancel"
         android:onClick="cancel" />
 
