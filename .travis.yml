@@ -18,4 +18,4 @@ cache:
   directories:
     - $HOME/.m2
 
-script: ./gradlew :library:build :library:test
+script: ./gradlew :library:build :library:test :sample:build
