@@ -1,3 +1,7 @@
+branches:
+  only:
+    - develop
+
 language: android
 
 android:
@@ -16,6 +20,7 @@ sudo: false
 
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/.gradle
+    - $HOME/.m2/repository
 
-script: ./gradlew :library:build :library:test :sample:build
+script: ./gradlew build :library:test
