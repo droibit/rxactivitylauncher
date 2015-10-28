@@ -1,6 +1,7 @@
 package com.github.droibit.rxactivitylauncher.app;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,7 +10,7 @@ import android.widget.Toast;
 import com.github.droibit.rxactivitylauncher.ActivityResult;
 import com.github.droibit.rxactivitylauncher.RxLauncher;
 
-import rx.android.schedulers.AndroidSchedulers;
+import rx.Observer;
 import rx.functions.Action1;
 
 import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
@@ -52,28 +53,42 @@ public class MainActivity extends AppCompatActivity {
 
     public void occurActivityNotFondException(View v) {
         final Intent intent = new Intent("test_action");
-        mLauncher.startActivityForResult(intent, REQUEST_ERROR)
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .doOnError(new Action1<Throwable>() {
-                     @Override
-                     public void call(Throwable throwable) {
-                         Toast.makeText(MainActivity.this, "Error occur : " + throwable.getCause(), Toast.LENGTH_SHORT).show();
-                     }
-                 }).subscribe(new Action1<ActivityResult>() {
-                    @Override public void call(ActivityResult result) {
-                        final String msg = result.isOk() ? "OK" : "Canceled";
-                        Toast.makeText(MainActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+        occurException(intent);
+    }
+
+    public void occurSecurityException(View v) {
+        final Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:01234567890"));
+        occurException(intent);
     }
 
     private void launchActivity(Intent intent) {
         mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
-                .subscribe(new Action1<ActivityResult>() {
-                    @Override public void call(ActivityResult result) {
-                        final String msg = result.isOk() ? "OK" : "Canceled";
-                        Toast.makeText(MainActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                 .subscribe(new Action1<ActivityResult>() {
+                     @Override public void call(ActivityResult result) {
+                         final String msg = result.isOk() ? "OK" : "Canceled";
+                         showToast("Received: " + msg);
+                     }
+                 });
+    }
+
+    private void occurException(Intent intent) {
+        mLauncher.startActivityForResult(intent, REQUEST_ERROR)
+                 .subscribe(new Observer<ActivityResult>() {
+                     @Override public void onCompleted() {
+                     }
+
+                     @Override public void onError(Throwable e) {
+                         showToast("Error occur: " + e.getClass().getSimpleName());
+                     }
+
+                     @Override public void onNext(ActivityResult result) {
+                         final String msg = result.isOk() ? "OK" : "Canceled";
+                         showToast("Received: " + msg);
+                     }
+                 });
+    }
+
+    private void showToast(String msg) {
+        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 }

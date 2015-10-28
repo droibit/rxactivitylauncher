@@ -113,6 +113,8 @@ public class RxLauncherTest {
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
 
+        launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
+
         testSubscriber.assertError(ane);
         testSubscriber.assertNotCompleted();
     }
@@ -128,6 +130,8 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+
+        launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         testSubscriber.assertError(SecurityException.class);
         testSubscriber.assertNotCompleted();

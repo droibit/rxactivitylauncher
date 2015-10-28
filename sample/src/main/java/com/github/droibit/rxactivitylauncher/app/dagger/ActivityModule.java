@@ -3,7 +3,6 @@ package com.github.droibit.rxactivitylauncher.app.dagger;
 import android.app.Activity;
 
 import com.github.droibit.rxactivitylauncher.RxLauncher;
-import com.github.droibit.rxactivitylauncher.app.controller.DaggerController;
 
 import dagger.Module;
 import dagger.Provides;

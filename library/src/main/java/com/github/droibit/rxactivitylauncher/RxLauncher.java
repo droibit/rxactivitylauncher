@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
@@ -23,7 +24,7 @@ import rx.subjects.PublishSubject;
  * Must call {@link #onActivityResult(int, int, Intent)} method in Activity or Fragment.
  *
  * If you use the implicit Intent, {@link ActivityNotFoundException} or {@link SecurityException} might occur.
- * So it is recommended that you use the {@link Observable#doOnError(Action1)}.
+ * So it is recommended that you use the {@link Observable#subscribe(Observer)}.
  *
  * @author kumagai
  */
@@ -108,7 +109,8 @@ public class RxLauncher {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         final PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
         if (subject == null) {
-            throw new IllegalStateException();
+            // There is no Subject If an error occurs.
+            return;
         }
         subject.onNext(new ActivityResult(resultCode, data));
         subject.onCompleted();
