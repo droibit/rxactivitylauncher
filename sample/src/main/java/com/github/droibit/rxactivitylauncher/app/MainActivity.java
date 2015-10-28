@@ -11,6 +11,8 @@ import com.github.droibit.rxactivitylauncher.RxLauncher;
 
 import rx.functions.Action1;
 
+import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
+
 /**
  * @author kumagai
  */
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startDetailActivity(View v) {
-        final Intent intent = DetailActivity.launchIntent(this);
+        final Intent intent = DetailActivity.launchIntent(this, false);
         launchActivity(intent);
     }
 
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(Intent intent) {
-        mLauncher.startActivityForResult(intent, DetailActivity.REQUEST_DETAIL)
+        mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
                 .subscribe(new Action1<ActivityResult>() {
                     @Override public void call(ActivityResult result) {
                         final String msg = result.isOk() ? "OK" : "Canceled";

@@ -1,5 +1,8 @@
 # RxActivityLauncher
 
+[![Build Status](https://travis-ci.org/droibit/RxActivityLauncher.svg?branch=develop)](https://travis-ci.org/droibit/RxActivityLauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/RxActivityLauncher/blob/develop/LICENSE)
+
+
 # License
 
     Copyright 2015 droibit

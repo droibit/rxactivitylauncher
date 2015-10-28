@@ -18,6 +18,8 @@ import javax.inject.Inject;
 
 import rx.functions.Action1;
 
+import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
+
 /**
  * @author kumagai
  */
@@ -51,8 +53,8 @@ public class DaggerActivity extends AppCompatActivity {
     }
 
     public void startDetailActivity(View v) {
-        final Intent intent = DetailActivity.launchIntent(this);
-        mLauncher.startActivityForResult(intent, DetailActivity.REQUEST_DETAIL)
+        final Intent intent = DetailActivity.launchIntent(this, false);
+        mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
                 .subscribe(new Action1<ActivityResult>() {
                     @Override public void call(ActivityResult result) {
                         final String msg = result.isOk() ? "OK" : "Canceled";
