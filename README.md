@@ -1,7 +1,20 @@
 # RxActivityLauncher
 
-[![Build Status](https://travis-ci.org/droibit/RxActivityLauncher.svg?branch=develop)](https://travis-ci.org/droibit/RxActivityLauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/RxActivityLauncher/blob/develop/LICENSE)
+[![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE)  ![Jitpack.io](https://img.shields.io/github/release/droibit/rxactivitylauncher.svg?label=JitPack)
 
+## Download
+
+Add the following code to module build.gradle.
+
+```
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile 'com.github.droibit:rxactivitylauncher:0.1.0'
+}
+```
 
 # License
 
