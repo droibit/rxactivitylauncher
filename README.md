@@ -4,7 +4,7 @@
 
 ## Download
 
-Add the following code to module build.gradle.
+Add the following code to build.gradle.
 
 ```
 repositories {
@@ -15,6 +15,66 @@ dependencies {
     compile 'com.github.droibit:rxactivitylauncher:0.1.0'
 }
 ```
+
+## Usage
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    private RxLauncher mLauncher;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Create an instance from the factory method
+        mLauncher = RxLauncher.from(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Always you must call the following #onActivityResult.
+        mLauncher.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // In the case of explicit intent
+    private void startActivityUsingExplicitIntent() {
+      Intent intent = new Intent(this, AnyActivity.class);
+      mLauncher.startActivityForResult(intent, REQUEST_ANY)
+               .subscribe(result -> {
+                   if (result.isOk()) {
+                       // Do in the case of RESULT_OK  
+                   } else {
+                       // Do in the case of RESULT_CANCELD
+                   }
+               });
+    }
+
+    // In the case of implicit intent
+    private void startActivityUsingImplicitIntent() {
+      Intent intent = new Intent(ANY_ACTION);
+      mLauncher.startActivityForResult(intent, REQUEST_ANY)
+               .subscribe(new Observer<ActivityResult>() {
+                    @Override public void onCompleted() {}
+
+                    @Override public void onError(Throwable e) {
+                        // ActivityNotFoundException or SecurityException might occur in implicit Intent.
+                    }
+
+                    @Override public void onNext(ActivityResult result) {
+                         // Do in the case of received any result.
+                    }
+              });
+    }    
+}
+```
+
+If you are using a RxLauncher outside Activity/Fragment, [Dagger2](http://google.github.io/dagger/) is useful.
+It is also using Dagger2 in the [sample app](https://github.com/droibit/rxactivitylauncher/tree/develop/sample).
+
+## TODO
+
+* Unsubscribe when the screen is destroyed.
 
 # License
 
