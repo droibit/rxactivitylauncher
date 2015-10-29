@@ -6,6 +6,12 @@
 
 When you receive the results start other activities, must use `Activity#onActivityResult(int, int Bundle)`. So, it is troublesome to receive results from the other activity. Library solves this problem by using the [RxJava](https://github.com/ReactiveX/RxJava).
 
+To call the `#startActivityForResult()`, supports the following classes.
+
+* Activity
+* Fragment
+* SupportFragment
+
 ### Download
 
 Add the following code to build.gradle.
