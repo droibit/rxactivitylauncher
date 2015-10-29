@@ -2,7 +2,11 @@
 
 [![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE)  ![Jitpack.io](https://img.shields.io/github/release/droibit/rxactivitylauncher.svg?label=JitPack)
 
-## Download
+[RxPermissions](https://github.com/tbruyelle/RxPermissions) inspired me to make this library.
+
+When you receive the results start other activities, must use `Activity#onActivityResult(int, int Bundle)`. So, it is troublesome to receive results from the other activity. Library solves this problem by using the [RxJava](https://github.com/ReactiveX/RxJava).
+
+### Download
 
 Add the following code to build.gradle.
 
@@ -16,7 +20,7 @@ dependencies {
 }
 ```
 
-## Usage
+### Usage
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -72,11 +76,11 @@ public class MainActivity extends AppCompatActivity {
 If you are using a RxLauncher outside Activity/Fragment, [Dagger2](http://google.github.io/dagger/) is useful.
 It is also using Dagger2 in the [sample app](https://github.com/droibit/rxactivitylauncher/tree/develop/sample).
 
-## TODO
+### TODO
 
 * Unsubscribe when the screen is destroyed.
 
-# License
+## License
 
     Copyright 2015 droibit
 
