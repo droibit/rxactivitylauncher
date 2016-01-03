@@ -59,7 +59,7 @@ public class RxLauncher {
     public static RxLauncher from(@NonNull android.support.v4.app.Fragment fragment) {
         return new RxLauncher(fragment.getContext(), new Launchers.SourceSupportFragment(fragment));
     }
-    
+
     private final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
     private final Launchable mDelegate;
     private final Context mContext;
