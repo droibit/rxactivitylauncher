@@ -7,8 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import rx.Observable;
@@ -54,12 +55,14 @@ public class RxLauncher {
         return new RxLauncher(new Launchers.SourceSupportFragment(fragment));
     }
 
-    private final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
     private final Launchable mDelegate;
 
+    @VisibleForTesting
+    Map<Integer, PublishSubject<ActivityResult>> mSubjects;
+
     RxLauncher(Launchable delegate) {
-        mSubjects = new HashMap<>(2);
         mDelegate = delegate;
+        mSubjects = null;
     }
 
     /**
@@ -97,23 +100,26 @@ public class RxLauncher {
      * @see android.support.v4.app.Fragment#onActivityResult(int, int, Intent)
      */
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        final PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
-        if (subject == null) {
-            // There is no Subject If an error occurs.
+        // There is no subjects, If an error occurs.
+        if (mSubjects == null) {
             return;
         }
+
+        final PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
         subject.onNext(new ActivityResult(resultCode, data));
         subject.onCompleted();
 
-        mSubjects.remove(requestCode);
+        mSubjects = null;
     }
 
     private Observable<ActivityResult> makeSubject(int requestCode) {
-        PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
-        if (subject == null) {
-            subject = PublishSubject.create();
-            mSubjects.put(requestCode, subject);
+        if (mSubjects != null) {
+            throw new IllegalStateException("Not finished last #startActivityForResult.");
         }
+
+        final PublishSubject<ActivityResult> subject = PublishSubject.create();
+        mSubjects = Collections.singletonMap(requestCode, subject);
+
         return subject;
     }
 }

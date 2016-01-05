@@ -23,6 +23,9 @@ class Launchers {
         private final Activity mActivity;
 
         SourceActivity(Activity activity) {
+            if (activity == null) {
+                throw new IllegalArgumentException("Activity should not be null.");
+            }
             mActivity = activity;
         }
 
@@ -41,6 +44,9 @@ class Launchers {
         private final Fragment mFragment;
 
         SourceFragment(Fragment fragment) {
+            if (fragment == null) {
+                throw new IllegalArgumentException("Fragment should not be null.");
+            }
             mFragment = fragment;
         }
 
@@ -59,6 +65,9 @@ class Launchers {
         private final android.support.v4.app.Fragment mFragment;
 
         SourceSupportFragment(android.support.v4.app.Fragment fragment) {
+            if (fragment == null) {
+                throw new IllegalArgumentException("Fragment should not be null.");
+            }
             mFragment = fragment;
         }
 

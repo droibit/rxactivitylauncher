@@ -16,8 +16,13 @@ import java.util.Arrays;
 
 import rx.observers.TestSubscriber;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -50,8 +55,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+        assertThat(launcher.mSubjects, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_OK, null);
+        assertThat(launcher.mSubjects, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -71,8 +78,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+        assertThat(launcher.mSubjects, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
+        assertThat(launcher.mSubjects, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -92,8 +101,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+        assertThat(launcher.mSubjects, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
+        assertThat(launcher.mSubjects, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -112,6 +123,7 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+        assertThat(launcher.mSubjects, is(nullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
@@ -130,6 +142,7 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
+        assertThat(launcher.mSubjects, is(nullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
