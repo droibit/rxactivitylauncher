@@ -1,5 +1,6 @@
 package com.github.droibit.rxactivitylauncher.app.controller;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
@@ -26,8 +27,8 @@ public class DaggerController {
     private final RxLauncher mLauncher;
 
     @Inject
-    public DaggerController(RxLauncher launcher) {
-        mContext = launcher.getContext();
+    public DaggerController(Activity activity, RxLauncher launcher) {
+        mContext = activity;
         mLauncher = launcher;
     }
 

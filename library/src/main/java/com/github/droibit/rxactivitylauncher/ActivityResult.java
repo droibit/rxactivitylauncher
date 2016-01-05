@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 public class ActivityResult {
 
     public final int resultCode;
+    @Nullable
     public final Intent data;
 
     ActivityResult(int resultCode, @Nullable Intent data) {
@@ -27,6 +28,7 @@ public class ActivityResult {
         return resultCode == Activity.RESULT_CANCELED;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,9 +38,9 @@ public class ActivityResult {
 
         if (resultCode != that.resultCode) return false;
         return !(data != null ? !data.equals(that.data) : that.data != null);
-
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int result = resultCode;
