@@ -18,11 +18,13 @@ import rx.subjects.PublishSubject;
 
 /**
  * Provide a way to receive the results of the {@link Activity} by RxJava.
- *
- * Must call {@link #onActivityResult(int, int, Intent)} method in Activity or Fragment.
- *
- * If you use the implicit Intent, {@link ActivityNotFoundException} or {@link SecurityException} might occur.
- * So it is recommended that you use the {@link Observable#subscribe(Observer)}.
+ * <p>
+ *  <b>Must call {@link #onActivityResult(int, int, Intent)} method in Activity or Fragment.</b><br>
+ * </p>
+ * <p>
+ *  If you use the implicit Intent, {@link ActivityNotFoundException} or {@link SecurityException} might occur.
+ *  So it is recommended that you use the {@link Observable#subscribe(Observer)}.
+ * </p>
  *
  * @author kumagai
  */
@@ -58,11 +60,11 @@ public class RxLauncher {
     private final Launchable mDelegate;
 
     @VisibleForTesting
-    Map<Integer, PublishSubject<ActivityResult>> mSubjects;
+    Map<Integer, PublishSubject<ActivityResult>> mSubject;
 
     RxLauncher(Launchable delegate) {
         mDelegate = delegate;
-        mSubjects = null;
+        mSubject = null;
     }
 
     /**
@@ -101,24 +103,24 @@ public class RxLauncher {
      */
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         // There is no subjects, If an error occurs.
-        if (mSubjects == null) {
+        if (mSubject == null) {
             return;
         }
 
-        final PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
+        final PublishSubject<ActivityResult> subject = mSubject.get(requestCode);
         subject.onNext(new ActivityResult(resultCode, data));
         subject.onCompleted();
 
-        mSubjects = null;
+        mSubject = null;
     }
 
     private Observable<ActivityResult> makeSubject(int requestCode) {
-        if (mSubjects != null) {
+        if (mSubject != null) {
             throw new IllegalStateException("Not finished last #startActivityForResult.");
         }
 
         final PublishSubject<ActivityResult> subject = PublishSubject.create();
-        mSubjects = Collections.singletonMap(requestCode, subject);
+        mSubject = Collections.singletonMap(requestCode, subject);
 
         return subject;
     }

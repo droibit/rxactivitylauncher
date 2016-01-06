@@ -55,10 +55,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
+        assertThat(launcher.mSubject, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_OK, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        assertThat(launcher.mSubject, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -78,10 +78,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
+        assertThat(launcher.mSubject, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        assertThat(launcher.mSubject, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -101,10 +101,10 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
+        assertThat(launcher.mSubject, is(notNullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        assertThat(launcher.mSubject, is(nullValue()));
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
@@ -123,7 +123,7 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        assertThat(launcher.mSubject, is(nullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
@@ -142,7 +142,7 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        assertThat(launcher.mSubject, is(nullValue()));
 
         launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
