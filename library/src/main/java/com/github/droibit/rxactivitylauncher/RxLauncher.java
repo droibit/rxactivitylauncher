@@ -94,6 +94,13 @@ public class RxLauncher {
     }
 
     /**
+     * If the Activity or Fragment has been called in after being re-created, immediately return the Observable.
+     */
+    public Observable<ActivityResult> restartActivityForResult(int requestCode) {
+        return makeSubject(requestCode);
+    }
+
+    /**
      * Receive a result from the started activity.<br/>
      * Should call in any of the reference methods.
      *

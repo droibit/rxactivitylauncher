@@ -113,6 +113,25 @@ public class RxLauncherTest {
     }
 
     @Test
+    public void recreateLauncher() {
+        final Activity activity = mock(Activity.class);
+
+        final RxLauncher launcher = RxLauncher.from(activity);
+        final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
+        launcher.restartActivityForResult(REQUEST_TEST)
+                .subscribe(testSubscriber);
+        assertThat(launcher.mSubject, is(notNullValue()));
+
+        launcher.onActivityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
+        assertThat(launcher.mSubject, is(nullValue()));
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertCompleted();
+        testSubscriber.assertUnsubscribed();
+        testSubscriber.assertReceivedOnNext(Arrays.asList(new ActivityResult(RESULT_FIRST_USER, null)));
+    }
+
+    @Test
     public void occurActivityNotFoundException() {
         final Activity activity = mock(Activity.class);
         final Exception ane = mock(ActivityNotFoundException.class);
