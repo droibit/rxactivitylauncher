@@ -13,6 +13,11 @@ import android.support.annotation.Nullable;
 interface Launchable {
 
     /**
+     * Get the launch source component class name.
+     */
+    String getName();
+
+    /**
      * Launch an activity for which you would like a result when it finished.
      **/
     void startActivityForResult(@NonNull Intent intent, int requestCode, @Nullable Bundle options);

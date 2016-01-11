@@ -49,7 +49,7 @@ public class DaggerActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mLauncher.onActivityResult(requestCode, resultCode, data);
+        mLauncher.activityResult(requestCode, resultCode, data);
     }
 
     public void startDetailActivity(View v) {

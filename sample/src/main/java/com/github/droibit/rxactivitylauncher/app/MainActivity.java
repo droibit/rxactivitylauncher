@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
 import com.github.droibit.rxactivitylauncher.RxLauncher;
+import com.jakewharton.rxbinding.view.RxView;
 
+import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 
@@ -31,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mLauncher = RxLauncher.from(this);
+
+        startDetailActivity(findViewById(R.id.btn_detail));
+        startDaggerActivity(findViewById(R.id.btn_dagger));
     }
 
     /** {@inheritDoc} */
@@ -38,17 +44,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mLauncher.onActivityResult(requestCode, resultCode, data);
+        mLauncher.activityResult(requestCode, resultCode, data);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mLauncher.destroy();
     }
 
     public void startDetailActivity(View v) {
         final Intent intent = DetailActivity.launchIntent(this, false);
-        launchActivity(intent);
+
+        launchActivity(RxView.clicks(v), intent);
     }
 
     public void startDaggerActivity(View v) {
         final Intent intent = DaggerActivity.launchIntent(this);
-        launchActivity(intent);
+
+        launchActivity(RxView.clicks(v), intent);
     }
 
     public void occurActivityNotFondException(View v) {
@@ -61,12 +77,13 @@ public class MainActivity extends AppCompatActivity {
         occurException(intent);
     }
 
-    private void launchActivity(Intent intent) {
-        mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
+    private void launchActivity(Observable<Void> trigger, Intent intent) {
+        mLauncher.startActivityForResult(trigger, intent, REQUEST_DETAIL)
                  .subscribe(new Action1<ActivityResult>() {
                      @Override public void call(ActivityResult result) {
                          final String msg = result.isOk() ? "OK" : "Canceled";
                          showToast("Received: " + msg);
+                         Log.d(BuildConfig.BUILD_TYPE, "Start Activity Result: " + msg);
                      }
                  });
     }
@@ -74,8 +91,7 @@ public class MainActivity extends AppCompatActivity {
     private void occurException(Intent intent) {
         mLauncher.startActivityForResult(intent, REQUEST_ERROR)
                  .subscribe(new Observer<ActivityResult>() {
-                     @Override public void onCompleted() {
-                     }
+                     @Override public void onCompleted() {}
 
                      @Override public void onError(Throwable e) {
                          showToast("Error occur: " + e.getClass().getSimpleName());
