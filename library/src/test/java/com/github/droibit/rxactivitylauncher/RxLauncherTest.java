@@ -65,7 +65,7 @@ public class RxLauncherTest {
     }
 
     @Test
-    public void launchFromActivity_triggerd() {
+    public void launchFromActivity_triggered() {
         final Activity activity = mock(Activity.class);
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
@@ -143,7 +143,7 @@ public class RxLauncherTest {
     }
 
     @Test
-    public void launchFromSupportFragment_triggerd() {
+    public void launchFromSupportFragment_triggered() {
         final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
 
