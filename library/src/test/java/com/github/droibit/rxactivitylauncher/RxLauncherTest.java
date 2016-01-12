@@ -3,7 +3,6 @@ package com.github.droibit.rxactivitylauncher;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,16 +12,18 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import rx.observers.TestSubscriber;
+import rx.subjects.PublishSubject;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.isNotNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -47,7 +48,7 @@ public class RxLauncherTest {
     }
 
     @Test
-    public void launchFromActivity() {
+    public void launchFromActivity_notrigger() {
         final Activity activity = mock(Activity.class);
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
@@ -55,61 +56,160 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
 
-        launcher.onActivityResult(REQUEST_TEST, RESULT_OK, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        launcher.activityResult(REQUEST_TEST, RESULT_OK, null);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
         testSubscriber.assertUnsubscribed();
-        testSubscriber.assertReceivedOnNext(Arrays.asList(new ActivityResult(RESULT_OK, null)));
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_OK, null)));
     }
 
     @Test
-    public void launchFromFragment() {
+    public void launchFromActivity_triggered() {
+        final Activity activity = mock(Activity.class);
+        doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
+
+        final RxLauncher launcher = RxLauncher.from(activity);
+
+        final PublishSubject<Object> trigger = PublishSubject.create();
+        final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
+        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+                .subscribe(testSubscriber);
+
+        trigger.onNext(null);
+        launcher.activityResult(REQUEST_TEST, RESULT_OK, null);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertNoTerminalEvent();
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_OK, null)));
+    }
+
+    @Test
+    public void launchFromFragment_notrigger() {
         final Fragment fragment = mock(Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final Activity activity = mock(Activity.class);
-        doReturn(activity).when(fragment).getActivity();
-
         final RxLauncher launcher = RxLauncher.from(fragment);
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
 
-        launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
         testSubscriber.assertUnsubscribed();
-        testSubscriber.assertReceivedOnNext(Arrays.asList(new ActivityResult(RESULT_CANCELED, null)));
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_CANCELED, null)));
     }
 
     @Test
-    public void launchFromSupportFragment() {
+    public void launchFromFragment_triggered() {
+        final Fragment fragment = mock(Fragment.class);
+        doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
+
+        final RxLauncher launcher = RxLauncher.from(fragment);
+        final PublishSubject<Object> trigger = PublishSubject.create();
+        final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
+        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+                .subscribe(testSubscriber);
+
+        trigger.onNext(null);
+        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertNoTerminalEvent();
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_CANCELED, null)));
+    }
+
+    @Test
+    public void launchFromSupportFragment_notrigger() {
         final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
-
-        final Context context = mock(Context.class);
-        doReturn(context).when(fragment).getContext();
 
         final RxLauncher launcher = RxLauncher.from(fragment);
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(notNullValue()));
 
-        launcher.onActivityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
-        assertThat(launcher.mSubjects, is(nullValue()));
+        launcher.activityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
 
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
         testSubscriber.assertUnsubscribed();
         testSubscriber.assertReceivedOnNext(Arrays.asList(new ActivityResult(RESULT_FIRST_USER, null)));
+    }
+
+    @Test
+    public void launchFromSupportFragment_triggered() {
+        final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
+        doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
+
+        final RxLauncher launcher = RxLauncher.from(fragment);
+        final PublishSubject<Object> trigger = PublishSubject.create();
+        final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
+        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+                .subscribe(testSubscriber);
+
+        trigger.onNext(null);
+        launcher.activityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
+
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertNoTerminalEvent();
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_FIRST_USER, null)));
+    }
+
+    @Test
+    public void multipleSubscription_triggered() {
+        final Activity activity = mock(Activity.class);
+        doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
+
+        final RxLauncher launcher = RxLauncher.from(activity);
+
+        final PublishSubject<Object> trigger = PublishSubject.create();
+        final TestSubscriber<ActivityResult> s1 = TestSubscriber.create();
+        final TestSubscriber<ActivityResult> s2= TestSubscriber.create();
+
+        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST).subscribe(s1);
+        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST).subscribe(s2);
+
+        trigger.onNext(null);
+        launcher.activityResult(REQUEST_TEST, RESULT_OK, null);
+
+        for (TestSubscriber<ActivityResult> subscriber : Arrays.asList(s1, s2)) {
+            subscriber.assertNoErrors();
+            subscriber.assertNoTerminalEvent();
+            subscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_OK, null)));
+        }
+    }
+
+    @Test
+    public void destroyActivityAfterLaunch() {
+        final Activity activity = mock(Activity.class);
+        doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
+
+        final PublishSubject<Object> trigger = PublishSubject.create();
+
+        final RxLauncher nonCompleteLauncher = RxLauncher.from(activity);
+        final TestSubscriber<ActivityResult> s1 = TestSubscriber.create();
+        nonCompleteLauncher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+                           .subscribe(s1);
+
+        trigger.onNext(null);
+        s1.assertNoValues();
+
+        nonCompleteLauncher.destroy();
+
+        final RxLauncher completeLauncher = RxLauncher.from(activity);
+        final TestSubscriber<ActivityResult> s2 = TestSubscriber.create();
+        completeLauncher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+                        .subscribe(s2);
+
+        completeLauncher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
+
+        s2.assertNoErrors();
+        s2.assertNoTerminalEvent();
+        s2.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_CANCELED, null)));
     }
 
     @Test
@@ -123,9 +223,8 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(nullValue()));
 
-        launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
+        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         testSubscriber.assertError(ane);
         testSubscriber.assertNotCompleted();
@@ -142,11 +241,14 @@ public class RxLauncherTest {
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
         launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
                 .subscribe(testSubscriber);
-        assertThat(launcher.mSubjects, is(nullValue()));
 
-        launcher.onActivityResult(REQUEST_TEST, RESULT_CANCELED, null);
+        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         testSubscriber.assertError(SecurityException.class);
         testSubscriber.assertNotCompleted();
+    }
+
+    // TODO: not impletemnt
+    public void unsibscribe() {
     }
 }

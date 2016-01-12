@@ -34,6 +34,12 @@ class Launchers {
         public void startActivityForResult(@NonNull Intent intent, int requestCode, @Nullable Bundle options) {
             mActivity.startActivityForResult(intent, requestCode, options);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getSourceName() {
+            return mActivity.getClass().getName();
+        }
     }
 
     /**
@@ -55,6 +61,12 @@ class Launchers {
         public void startActivityForResult(@NonNull Intent intent, int requestCode, @Nullable Bundle options) {
             mFragment.startActivityForResult(intent, requestCode, options);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getSourceName() {
+            return mFragment.getClass().getName();
+        }
     }
 
     /**
@@ -75,6 +87,12 @@ class Launchers {
         @Override
         public void startActivityForResult(@NonNull Intent intent, int requestCode, @Nullable Bundle options) {
             mFragment.startActivityForResult(intent, requestCode);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String getSourceName() {
+            return mFragment.getClass().getName();
         }
     }
 }
