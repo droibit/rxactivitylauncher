@@ -15,7 +15,7 @@ interface Launchable {
     /**
      * Get the launch source component class name.
      */
-    String getName();
+    String getSourceName();
 
     /**
      * Launch an activity for which you would like a result when it finished.

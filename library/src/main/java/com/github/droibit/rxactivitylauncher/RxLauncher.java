@@ -18,8 +18,6 @@ import rx.Observer;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-import static com.github.droibit.rxactivitylauncher.SharedRequest.DEFAULT_SUBJECT_SIZE;
-
 /**
  * Provide a way to receive the results of the {@link Activity} by RxJava.
  * <p>
@@ -61,23 +59,45 @@ public class RxLauncher {
         return new RxLauncher(new Launchers.SourceSupportFragment(fragment));
     }
 
-    final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
-    
+    // Restore the non-complete request code.
+    private static Set<Integer> restoreRequests(String sourceName) {
+        Set<Integer> requests = mNonCompleteRequests.get(sourceName);
+        if (requests == null) {
+            requests = new HashSet<>(DEFAULT_SUBJECT_SIZE);
+            mNonCompleteRequests.put(sourceName, requests);
+        }
+        return requests;
+    }
+
+    // Store the non-complete request code.
+    private static void storeRequests(String sourceName, @Nullable Set<Integer> nonCompleteRequests) {
+        Set<Integer> storeRequests = nonCompleteRequests;
+        if (storeRequests == null) {
+            storeRequests = new HashSet<>(DEFAULT_SUBJECT_SIZE);
+        }
+        mNonCompleteRequests.put(sourceName, storeRequests);
+    }
+
+    private static final int DEFAULT_SUBJECT_SIZE = 3;
+    private static final Map<String, Set<Integer>> mNonCompleteRequests
+            = new HashMap<>(DEFAULT_SUBJECT_SIZE);
+
+    private final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
     private final Launchable mDelegate;
     private final Set<Integer> mStoredRequests;
 
     RxLauncher(Launchable delegate) {
         mDelegate = delegate;
         mSubjects = new HashMap<>(DEFAULT_SUBJECT_SIZE);
-        mStoredRequests = SharedRequest.restore(delegate.getName());
+        mStoredRequests = restoreRequests(delegate.getSourceName());
     }
 
     /**
-     * TODO
+     * When the source component is destroyed, unsubscribe all of the Observers.
+     * But, <b>Observable of trigger manually to unsubscribe.</b>
      */
     public void destroy() {
-        final Set<Integer> storeRequests = new HashSet<>(mSubjects.keySet());
-        SharedRequest.store(mDelegate.getName(), storeRequests);
+        storeRequests(mDelegate.getSourceName(), new HashSet<>(mSubjects.keySet()));
 
         for (PublishSubject<ActivityResult> subject : mSubjects.values()) {
             subject.onCompleted();

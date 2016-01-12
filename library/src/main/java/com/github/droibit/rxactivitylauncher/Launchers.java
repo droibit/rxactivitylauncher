@@ -37,7 +37,7 @@ class Launchers {
 
         /** {@inheritDoc} */
         @Override
-        public String getName() {
+        public String getSourceName() {
             return mActivity.getClass().getName();
         }
     }
@@ -64,7 +64,7 @@ class Launchers {
 
         /** {@inheritDoc} */
         @Override
-        public String getName() {
+        public String getSourceName() {
             return mFragment.getClass().getName();
         }
     }
@@ -91,7 +91,7 @@ class Launchers {
 
         /** {@inheritDoc} */
         @Override
-        public String getName() {
+        public String getSourceName() {
             return mFragment.getClass().getName();
         }
     }
