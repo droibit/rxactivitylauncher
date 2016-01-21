@@ -34,6 +34,7 @@ public class ActivityModule {
         return new CompositeSubscription();
     }
 
+    // FIXME:
     @Provides
     @PerActivity
     RxLauncher provideRxLauncher() {

@@ -5,6 +5,8 @@ import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -46,20 +48,31 @@ public class RxLauncher {
     }
 
     /**
-     * When the source component is destroyed, unsubscribe all of the Observers.
-     * But, <b>Observable of trigger manually to unsubscribe.</b>
+     * Set the launch source component({@link Activity}) of other activity.
+     *
+     * @return New {@link @Launchable} instance.
      */
-    public void destroy() {
-    }
-
+    @CheckResult
     public Launchable from(Activity source) {
         return new Launchers.SourceActivity(this, source);
     }
 
+    /**
+     * Set the launch source component({@link Fragment}) of other activity.
+     *
+     * @return {@link @Launchable} instance.
+     */
+    @CheckResult
     public Launchable from(Fragment source) {
         return new Launchers.SourceFragment(this, source);
     }
 
+    /**
+     * Set the launch source component({@link android.support.v4.app.Fragment}) of other activity.
+     *
+     * @return {@link @Launchable} instance.
+     */
+    @CheckResult
     public Launchable from(android.support.v4.app.Fragment source) {
         return new Launchers.SourceSupportFragment(this, source);
     }

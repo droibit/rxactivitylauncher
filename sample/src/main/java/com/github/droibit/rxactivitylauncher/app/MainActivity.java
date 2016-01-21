@@ -17,6 +17,7 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
+import static com.github.droibit.rxactivitylauncher.app.DaggerActivity.REQUEST_DAGGER;
 import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
 
 /**
@@ -61,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
     public void startDetailActivity(View v) {
         final Intent intent = DetailActivity.launchIntent(this, false);
 
-        launchActivity(RxView.clicks(v), intent);
+        launchActivity(RxView.clicks(v), intent, REQUEST_DETAIL);
     }
 
     public void startDaggerActivity(View v) {
         final Intent intent = DaggerActivity.launchIntent(this);
 
-        launchActivity(RxView.clicks(v), intent);
+        launchActivity(RxView.clicks(v), intent, REQUEST_DAGGER);
     }
 
     public void occurActivityNotFondException(View v) {
@@ -80,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
         occurException(intent);
     }
 
-    private void launchActivity(Observable<Void> trigger, Intent intent) {
+    private void launchActivity(Observable<Void> trigger, Intent intent, int requestCode) {
         mCompositeSubscription.add(
                 mLauncher.from(this)
-                        .startActivityForResult(trigger, intent, REQUEST_DETAIL, null)
+                        .startActivityForResult(trigger, intent, requestCode, null)
                         .subscribe(new Action1<ActivityResult>() {
                             @Override
                             public void call(ActivityResult result) {

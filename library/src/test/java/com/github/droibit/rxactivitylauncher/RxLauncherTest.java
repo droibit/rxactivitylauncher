@@ -196,23 +196,23 @@ public class RxLauncherTest {
 
         final PublishSubject<Object> trigger = PublishSubject.create();
 
-        final RxLauncher launcher = RxLauncher.getInstance();
+        final RxLauncher launcher1 = RxLauncher.getInstance();
         final TestSubscriber<ActivityResult> s1 = TestSubscriber.create();
-        launcher.from(activity)
+        launcher1.from(activity)
                 .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(s1);
 
         trigger.onNext(null);
         s1.assertNoValues();
+        s1.unsubscribe();
 
-        launcher.destroy();
-
+        final RxLauncher launcher2 = RxLauncher.getInstance();
         final TestSubscriber<ActivityResult> s2 = TestSubscriber.create();
-        launcher.from(activity)
-                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
-                .subscribe(s2);
+        launcher2.from(activity)
+                 .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
+                 .subscribe(s2);
 
-        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
+        launcher2.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         s2.assertNoErrors();
         s2.assertNoTerminalEvent();

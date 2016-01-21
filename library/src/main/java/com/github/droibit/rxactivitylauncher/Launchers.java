@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -34,6 +35,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
                                                                  int requestCode,
@@ -42,6 +44,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
                                                                  @NonNull Intent intent,
@@ -74,6 +77,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
                                                                  int requestCode,
@@ -82,6 +86,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
                                                                  @NonNull Intent intent,
@@ -114,6 +119,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
                                                                  int requestCode,
@@ -122,6 +128,7 @@ class Launchers {
         }
 
         /** {@inheritDoc} */
+        @CheckResult
         @Override
         public Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
                                                                  @NonNull Intent intent,

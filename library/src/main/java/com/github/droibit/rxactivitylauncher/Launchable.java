@@ -2,6 +2,7 @@ package com.github.droibit.rxactivitylauncher;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -17,6 +18,7 @@ public abstract class Launchable {
     /**
      * Launch an activity for which you would like a result when it finished.
      **/
+    @CheckResult
     public abstract Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
                                                                       int requestCode,
                                                                       @Nullable Bundle options);
@@ -27,6 +29,7 @@ public abstract class Launchable {
      * After other activity launched, you use this method if the screen might rotate.
      * </p>
      */
+    @CheckResult
     public abstract Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
                                                                       @NonNull Intent intent,
                                                                       int requestCode,

@@ -25,6 +25,8 @@ import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_D
  */
 public class DaggerActivity extends AppCompatActivity {
 
+    public static final int REQUEST_DAGGER = 2;
+
     public static Intent launchIntent(Context context) {
         return new Intent(context, DaggerActivity.class);
     }
