@@ -25,6 +25,8 @@ import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_D
  */
 public class DaggerActivity extends AppCompatActivity {
 
+    public static final int REQUEST_DAGGER = 2;
+
     public static Intent launchIntent(Context context) {
         return new Intent(context, DaggerActivity.class);
     }
@@ -54,12 +56,12 @@ public class DaggerActivity extends AppCompatActivity {
 
     public void startDetailActivity(View v) {
         final Intent intent = DetailActivity.launchIntent(this, false);
-        mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
-                .subscribe(new Action1<ActivityResult>() {
-                    @Override public void call(ActivityResult result) {
-                        final String msg = result.isOk() ? "OK" : "Canceled";
-                        Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
-                    }
+        mLauncher.from(this).startActivityForResult(intent, REQUEST_DETAIL, null)
+                 .subscribe(new Action1<ActivityResult>() {
+                     @Override public void call(ActivityResult result) {
+                         final String msg = result.isOk() ? "OK" : "Canceled";
+                         Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
+                     }
                 });
     }
 

@@ -1,7 +1,6 @@
 package com.github.droibit.rxactivitylauncher.app.controller;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -14,6 +13,7 @@ import javax.inject.Inject;
 
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.github.droibit.rxactivitylauncher.app.DetailActivity.*;
 
@@ -23,18 +23,20 @@ import static com.github.droibit.rxactivitylauncher.app.DetailActivity.*;
 @PerActivity
 public class DaggerController {
 
-    private final Context mContext;
+    private final Activity mActivity;
     private final RxLauncher mLauncher;
+    private final CompositeSubscription mCompositeSubscription;
 
     @Inject
-    public DaggerController(Activity activity, RxLauncher launcher) {
-        mContext = activity;
+    public DaggerController(Activity activity, RxLauncher launcher, CompositeSubscription compositeSubscription) {
+        mActivity = activity;
         mLauncher = launcher;
+        mCompositeSubscription = compositeSubscription;
     }
 
     public void startDetailActivity() {
-        final Intent intent = DetailActivity.launchIntent(mContext, true);
-        mLauncher.startActivityForResult(intent, REQUEST_DETAIL)
+        final Intent intent = DetailActivity.launchIntent(mActivity, true);
+        mLauncher.from(mActivity).startActivityForResult(intent, REQUEST_DETAIL, null)
                  .filter(new Func1<ActivityResult, Boolean>() {
                      @Override public Boolean call(ActivityResult result) {
                          return result.isOk();
@@ -43,8 +45,12 @@ public class DaggerController {
                      @Override
                      public void call(ActivityResult result) {
                          final String msg = result.data.getStringExtra(KEY_RESPONSE_MSG);
-                         Toast.makeText(mContext, "Received: " + msg, Toast.LENGTH_SHORT).show();
+                         Toast.makeText(mActivity, "Received: " + msg, Toast.LENGTH_SHORT).show();
                      }
                  }) ;
+    }
+
+    public void destroy() {
+
     }
 }

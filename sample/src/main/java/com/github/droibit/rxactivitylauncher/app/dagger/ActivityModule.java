@@ -4,8 +4,11 @@ import android.app.Activity;
 
 import com.github.droibit.rxactivitylauncher.RxLauncher;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * @author kumagai
@@ -27,7 +30,14 @@ public class ActivityModule {
 
     @Provides
     @PerActivity
+    CompositeSubscription provideCompositeSubscription() {
+        return new CompositeSubscription();
+    }
+
+    // FIXME:
+    @Provides
+    @PerActivity
     RxLauncher provideRxLauncher() {
-        return RxLauncher.from(mActivity);
+        return RxLauncher.getInstance();
     }
 }

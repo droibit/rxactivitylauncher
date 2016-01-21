@@ -3,7 +3,6 @@
 buildscript {
     ext {
         support_library_version = '23.1.1'
-        dagger2_version = '2.0.2'
     }
 
     repositories {
@@ -36,5 +35,5 @@ rootProject.ext {
     minSdkVersion = 16
     targetSdkVersion = 23
     versionCode = 1
-    versionName = "0.2.0"
+    versionName = "0.3.0"
 }

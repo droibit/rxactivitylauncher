@@ -1,4 +1,7 @@
 buildscript {
+    ext {
+        dagger2_version = '2.0.2'
+    }
     repositories {
         mavenCentral()
     }
@@ -41,6 +44,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:$support_library_version"
     compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
+    compile 'io.reactivex:rxandroid:1.1.0'
 
     compile "com.google.dagger:dagger:$dagger2_version"
     apt "com.google.dagger:dagger-compiler:$dagger2_version"
