@@ -52,9 +52,10 @@ public class RxLauncherTest {
         final Activity activity = mock(Activity.class);
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(activity);
+        final RxLauncher launcher = new RxLauncher();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
+        launcher.from(activity)
+                .startActivityForResult(mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         launcher.activityResult(REQUEST_TEST, RESULT_OK, null);
@@ -70,11 +71,12 @@ public class RxLauncherTest {
         final Activity activity = mock(Activity.class);
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(activity);
+        final RxLauncher launcher = new RxLauncher();
 
         final PublishSubject<Object> trigger = PublishSubject.create();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+        launcher.from(activity)
+                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         trigger.onNext(null);
@@ -90,9 +92,10 @@ public class RxLauncherTest {
         final Fragment fragment = mock(Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final RxLauncher launcher = new RxLauncher();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
+        launcher.from(fragment)
+                .startActivityForResult(mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
@@ -108,10 +111,11 @@ public class RxLauncherTest {
         final Fragment fragment = mock(Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final RxLauncher launcher = new RxLauncher();
         final PublishSubject<Object> trigger = PublishSubject.create();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+        launcher.from(fragment)
+                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         trigger.onNext(null);
@@ -127,9 +131,10 @@ public class RxLauncherTest {
         final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final RxLauncher launcher = new RxLauncher();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
+        launcher.from(fragment)
+                .startActivityForResult(mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         launcher.activityResult(REQUEST_TEST, RESULT_FIRST_USER, null);
@@ -145,10 +150,11 @@ public class RxLauncherTest {
         final android.support.v4.app.Fragment fragment = mock(android.support.v4.app.Fragment.class);
         doNothing().when(fragment).startActivityForResult(any(Intent.class), anyInt());
 
-        final RxLauncher launcher = RxLauncher.from(fragment);
+        final RxLauncher launcher = new RxLauncher();
         final PublishSubject<Object> trigger = PublishSubject.create();
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
+        launcher.from(fragment)
+                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         trigger.onNext(null);
@@ -164,14 +170,14 @@ public class RxLauncherTest {
         final Activity activity = mock(Activity.class);
         doNothing().when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(activity);
+        final RxLauncher launcher = new RxLauncher();
 
         final PublishSubject<Object> trigger = PublishSubject.create();
         final TestSubscriber<ActivityResult> s1 = TestSubscriber.create();
         final TestSubscriber<ActivityResult> s2= TestSubscriber.create();
 
-        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST).subscribe(s1);
-        launcher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST).subscribe(s2);
+        launcher.from(activity).startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null).subscribe(s1);
+        launcher.from(activity).startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null).subscribe(s2);
 
         trigger.onNext(null);
         launcher.activityResult(REQUEST_TEST, RESULT_OK, null);
@@ -190,22 +196,23 @@ public class RxLauncherTest {
 
         final PublishSubject<Object> trigger = PublishSubject.create();
 
-        final RxLauncher nonCompleteLauncher = RxLauncher.from(activity);
+        final RxLauncher launcher = RxLauncher.getInstance();
         final TestSubscriber<ActivityResult> s1 = TestSubscriber.create();
-        nonCompleteLauncher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
-                           .subscribe(s1);
+        launcher.from(activity)
+                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
+                .subscribe(s1);
 
         trigger.onNext(null);
         s1.assertNoValues();
 
-        nonCompleteLauncher.destroy();
+        launcher.destroy();
 
-        final RxLauncher completeLauncher = RxLauncher.from(activity);
         final TestSubscriber<ActivityResult> s2 = TestSubscriber.create();
-        completeLauncher.startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST)
-                        .subscribe(s2);
+        launcher.from(activity)
+                .startActivityForResult(trigger, mLaunchIntent, REQUEST_TEST, null)
+                .subscribe(s2);
 
-        completeLauncher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
+        launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
 
         s2.assertNoErrors();
         s2.assertNoTerminalEvent();
@@ -218,10 +225,11 @@ public class RxLauncherTest {
         final Exception ane = mock(ActivityNotFoundException.class);
         doThrow(ane).when(activity).startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(activity);
+        final RxLauncher launcher = new RxLauncher();
 
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
+        launcher.from(activity)
+                .startActivityForResult(mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);
@@ -236,10 +244,11 @@ public class RxLauncherTest {
         doThrow(SecurityException.class).when(activity)
                 .startActivityForResult(any(Intent.class), anyInt(), any(Bundle.class));
 
-        final RxLauncher launcher = RxLauncher.from(activity);
+        final RxLauncher launcher = new RxLauncher();
 
         final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
-        launcher.startActivityForResult(mLaunchIntent, REQUEST_TEST)
+        launcher.from(activity)
+                .startActivityForResult(mLaunchIntent, REQUEST_TEST, null)
                 .subscribe(testSubscriber);
 
         launcher.activityResult(REQUEST_TEST, RESULT_CANCELED, null);

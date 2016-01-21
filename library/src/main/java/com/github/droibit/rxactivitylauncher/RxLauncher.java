@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,64 +33,16 @@ import rx.subjects.PublishSubject;
  */
 public class RxLauncher {
 
-    /**
-     * Make {@link RxLauncher} to launch from the {@link Activity}.<br/>
-     *
-     * @param activity Source {@link Activity}
-     */
-    public static RxLauncher from(@NonNull Activity activity) {
-        return new RxLauncher(new Launchers.SourceActivity(activity));
+    public static RxLauncher getInstance() {
+        return mInstance;
     }
-
-    /**
-     * Make {@link RxLauncher} to launch from the {@link Fragment}.
-     *
-     * @param fragment Source {@link Fragment}
-     */
-    public static RxLauncher from(@NonNull Fragment fragment) {
-        return new RxLauncher(new Launchers.SourceFragment(fragment));
-    }
-
-    /**
-     * Make {@link RxLauncher} to launch from the {@link android.support.v4.app.Fragment}.
-     *
-     * @param fragment Source {@link android.support.v4.app.Fragment}
-     */
-    public static RxLauncher from(@NonNull android.support.v4.app.Fragment fragment) {
-        return new RxLauncher(new Launchers.SourceSupportFragment(fragment));
-    }
-
-    // Restore the non-complete request code.
-    private static Set<Integer> restoreRequests(String sourceName) {
-        Set<Integer> requests = mNonCompleteRequests.get(sourceName);
-        if (requests == null) {
-            requests = new HashSet<>(DEFAULT_SUBJECT_SIZE);
-            mNonCompleteRequests.put(sourceName, requests);
-        }
-        return requests;
-    }
-
-    // Store the non-complete request code.
-    private static void storeRequests(String sourceName, @Nullable Set<Integer> nonCompleteRequests) {
-        Set<Integer> storeRequests = nonCompleteRequests;
-        if (storeRequests == null) {
-            storeRequests = new HashSet<>(DEFAULT_SUBJECT_SIZE);
-        }
-        mNonCompleteRequests.put(sourceName, storeRequests);
-    }
-
-    private static final int DEFAULT_SUBJECT_SIZE = 3;
-    private static final Map<String, Set<Integer>> mNonCompleteRequests
-            = new HashMap<>(DEFAULT_SUBJECT_SIZE);
+    private static final RxLauncher mInstance = new RxLauncher();
 
     private final Map<Integer, PublishSubject<ActivityResult>> mSubjects;
-    private final Launchable mDelegate;
-    private final Set<Integer> mStoredRequests;
 
-    RxLauncher(Launchable delegate) {
-        mDelegate = delegate;
-        mSubjects = new HashMap<>(DEFAULT_SUBJECT_SIZE);
-        mStoredRequests = restoreRequests(delegate.getSourceName());
+    @VisibleForTesting
+    RxLauncher() {
+        mSubjects = new HashMap<>(3);
     }
 
     /**
@@ -97,24 +50,18 @@ public class RxLauncher {
      * But, <b>Observable of trigger manually to unsubscribe.</b>
      */
     public void destroy() {
-        storeRequests(mDelegate.getSourceName(), new HashSet<>(mSubjects.keySet()));
-
-        for (PublishSubject<ActivityResult> subject : mSubjects.values()) {
-            subject.onCompleted();
-        }
-        mSubjects.clear();
     }
 
-    /**
-     * Launch an activity for which you would like a result when it finished.
-     *
-     * @see Activity#startActivityForResult(Intent, int)
-     * @see Fragment#startActivityForResult(Intent, int)
-     * @see android.support.v4.app.Fragment#startActivityForResult(Intent, int)
-     */
-    public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
-                                                             int requestCode) {
-        return startActivityForResult(null, intent, requestCode, null);
+    public Launchable from(Activity source) {
+        return new Launchers.SourceActivity(this, source);
+    }
+
+    public Launchable from(Fragment source) {
+        return new Launchers.SourceFragment(this, source);
+    }
+
+    public Launchable from(android.support.v4.app.Fragment source) {
+        return new Launchers.SourceSupportFragment(this, source);
     }
 
     /**
@@ -123,11 +70,13 @@ public class RxLauncher {
      * @see Activity#startActivityForResult(Intent, int, Bundle)
      * @see Fragment#startActivityForResult(Intent, int, Bundle)
      */
-    public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent,
-                                                             int requestCode,
-                                                             @Nullable Bundle options) {
-        return startActivityForResult(null, intent, requestCode, options);
+    Observable<ActivityResult> startActivityForResult(@NonNull Launchable source,
+                                                      @NonNull Intent intent,
+                                                      int requestCode,
+                                                      @Nullable Bundle options) {
+        return startActivityForResult(source, null, intent, requestCode, options);
     }
+
 
     /**
      * Launch an activity for which you would like a result when it finished.
@@ -135,28 +84,15 @@ public class RxLauncher {
      * After other activity launched, you use this method if the screen might rotate.
      * </p>
      */
-    public Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
-                                                             @NonNull Intent intent,
-                                                             int requestCode) {
-        return startActivityForResult(trigger, intent, requestCode, null);
-
-    }
-
-    /**
-     * Launch an activity for which you would like a result when it finished.
-     * <p>
-     * After other activity launched, you use this method if the screen might rotate.
-     * </p>
-     */
-    public Observable<ActivityResult> startActivityForResult(@Nullable Observable<?> trigger,
-                                                             @NonNull final Intent intent,
-                                                             final int requestCode,
-                                                             @Nullable final Bundle options) {
+    Observable<ActivityResult> startActivityForResult(@NonNull final Launchable source,
+                                                      @Nullable Observable<?> trigger,
+                                                      @NonNull final Intent intent,
+                                                      final int requestCode,
+                                                      @Nullable final Bundle options) {
         return triggerObservable(trigger, requestCode)
                 .flatMap(new Func1<Object, Observable<ActivityResult>>() {
-                    @Override
-                    public Observable<ActivityResult> call(Object o) {
-                        return startActivityObservable(intent, requestCode, options);
+                    @Override public Observable<ActivityResult> call(Object o) {
+                        return startActivityObservable(source, intent, requestCode, options);
                     }
                 });
     }
@@ -178,10 +114,6 @@ public class RxLauncher {
 
         subject.onNext(new ActivityResult(resultCode, data));
         subject.onCompleted();
-
-        if (!mStoredRequests.isEmpty()) {
-            mStoredRequests.clear();
-        }
     }
 
     private Observable<?> triggerObservable(Observable<?> trigger, int requestCode) {
@@ -189,24 +121,26 @@ public class RxLauncher {
             return Observable.just(null);
         }
 
-        if (mStoredRequests.contains(requestCode)) {
+        if (mSubjects.containsKey(requestCode)) {
             return Observable.merge(trigger, Observable.just(null));
         }
         return trigger;
     }
 
-    private Observable<ActivityResult> startActivityObservable(Intent intent,
+    private Observable<ActivityResult> startActivityObservable(Launchable source,
+                                                               Intent intent,
                                                                int requestCode,
                                                                Bundle options) {
         PublishSubject<ActivityResult> subject = mSubjects.get(requestCode);
+        final boolean existSubject = subject != null;
         if (subject == null) {
             subject = PublishSubject.create();
             mSubjects.put(requestCode, subject);
         }
 
-        if (!mStoredRequests.contains(requestCode)) {
+        if (!existSubject) {
             try {
-                mDelegate.startActivityForResult(intent, requestCode, options);
+                source.startActivity(intent, requestCode, options);
             } catch (Exception e) {
                 return Observable.error(e);
             }
