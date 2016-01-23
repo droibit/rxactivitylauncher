@@ -18,14 +18,9 @@ import rx.observers.TestSubscriber;
 import rx.subjects.PublishSubject;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -142,7 +137,7 @@ public class RxLauncherTest {
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
         testSubscriber.assertUnsubscribed();
-        testSubscriber.assertReceivedOnNext(Arrays.asList(new ActivityResult(RESULT_FIRST_USER, null)));
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_FIRST_USER, null)));
     }
 
     @Test
