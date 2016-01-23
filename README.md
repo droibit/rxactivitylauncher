@@ -1,12 +1,15 @@
 # RxActivityLauncher
 
-[![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE)  ![Jitpack.io](https://img.shields.io/github/release/droibit/rxactivitylauncher.svg?label=JitPack)
+[![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE)  ![Jitpack.io](https://jitpack.io/v/droibit/rxactivitylauncher.svg)
 
 [RxPermissions](https://github.com/tbruyelle/RxPermissions) inspired me to make this library.
 
-When you receive the results start other activities, must use `Activity#onActivityResult(int, int Bundle)`. So, it is troublesome to receive results from the other activity. Library solves this problem by using the [RxJava](https://github.com/ReactiveX/RxJava).
 
-To call the `#startActivityForResult()`, supports the following classes.
+
+When you receive the result start other activity, must use `Activity#onActivityResult(int, int, Bundle)` or `Fragment#onActivityResult(int, int, Bundle)`. 
+So, it is troublesome to receive result from the other activity. Library solves this problem by using the [RxJava](https://github.com/ReactiveX/RxJava).
+
+Supports the following classes.
 
 * Activity
 * Fragment
@@ -22,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.droibit:rxactivitylauncher:0.1.0'
+    compile 'com.github.droibit:rxactivitylauncher:0.3.0'
 }
 ```
 
@@ -31,13 +34,21 @@ dependencies {
 ```java
 public class MainActivity extends AppCompatActivity {
 
-    private RxLauncher mLauncher;
+    // Get a singleton instance.
+    private RxLauncher mLauncher = RxLauncher.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Create an instance from the factory method
-        mLauncher = RxLauncher.from(this);
+        
+        // If the screen is rotated. Use RxBinding to trigger.
+        // https://github.com/JakeWharton/RxBinding
+        Observable<Void> trigger = RxView.clicks(findViewById(R.id.button))
+        mLauncher.from(this)
+                 .startActivityForResult(trigger, intent, REQUEST_ANY, null)
+                 .subscribe(result -> {
+                     // Do something.
+                 }
     }
 
     @Override
@@ -50,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
     // In the case of explicit intent
     private void startActivityUsingExplicitIntent() {
       Intent intent = new Intent(this, AnyActivity.class);
-      mLauncher.startActivityForResult(intent, REQUEST_ANY)
+      mLauncher.from(this)
+               .startActivityForResult(intent, REQUEST_ANY, null)
                .subscribe(result -> {
                    if (result.isOk()) {
                        // Do in the case of RESULT_OK  
@@ -63,28 +75,29 @@ public class MainActivity extends AppCompatActivity {
     // In the case of implicit intent
     private void startActivityUsingImplicitIntent() {
       Intent intent = new Intent(ANY_ACTION);
-      mLauncher.startActivityForResult(intent, REQUEST_ANY)
+      mLauncher.from(this)
+               .startActivityForResult(intent, REQUEST_ANY, null)
                .subscribe(new Observer<ActivityResult>() {
                     @Override public void onCompleted() {}
 
                     @Override public void onError(Throwable e) {
-                        // ActivityNotFoundException or SecurityException might occur in implicit Intent.
+                        // Exception might occur in implicit Intent.
                     }
 
                     @Override public void onNext(ActivityResult result) {
                          // Do in the case of received any result.
                     }
               });
-    }    
+    }
 }
 ```
 
-If you are using a RxLauncher outside Activity/Fragment, [Dagger2](http://google.github.io/dagger/) is useful.
-It is also using Dagger2 in the [sample app](https://github.com/droibit/rxactivitylauncher/tree/develop/sample).
+### Change Log
 
-### TODO
-
-* Unsubscribe when the screen is destroyed.
+#### Version 0.3.0 *(2016-01-21)*
+ 
+ * Support the rotation of screen.  
+   This version includes a break change. When launch other activity, specify source component. 
 
 ## License
 
