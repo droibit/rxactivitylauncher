@@ -251,8 +251,4 @@ public class RxLauncherTest {
         testSubscriber.assertError(SecurityException.class);
         testSubscriber.assertNotCompleted();
     }
-
-    // TODO: not impletemnt
-    public void unsibscribe() {
-    }
 }

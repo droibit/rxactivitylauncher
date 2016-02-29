@@ -2,7 +2,7 @@
 
 buildscript {
     ext {
-        support_library_version = '23.1.1'
+        support_library_version = '23.2.0'
     }
 
     repositories {
@@ -30,10 +30,10 @@ task clean(type: Delete) {
 
 rootProject.ext {
     compileSdkVersion = 23
-    buildToolsVersion = '23.0.1'
+    buildToolsVersion = '23.0.2'
 
     minSdkVersion = 16
     targetSdkVersion = 23
-    versionCode = 1
-    versionName = "0.3.0"
+    versionCode = 3
+    versionName = "0.3.1"
 }
