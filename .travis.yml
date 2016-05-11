@@ -1,18 +1,18 @@
-branches:
-  except:
-    - master
-
 language: android
 
 android:
   components:
-    - build-tools-23.0.2
-    - android-23
+    - platform-tools
     - tools
+    - build-tools-23.0.3
+    - android-23
     - extra-android-m2repository
 
 jdk:
   - oraclejdk8
+
+script:
+  - ./gradlew clean test --info
 
 notifications:
   email: false
@@ -23,5 +23,3 @@ cache:
   directories:
     - $HOME/.gradle
     - $HOME/.m2/repository
-
-script: ./gradlew build :library:test
