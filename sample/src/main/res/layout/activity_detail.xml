@@ -11,19 +11,19 @@
     android:orientation="vertical"
     tools:context="com.github.droibit.rxactivitylauncher.app.DetailActivity">
 
-    <android.support.v7.widget.AppCompatTextView
+    <TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp" />
 
-    <android.support.v7.widget.AppCompatTextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Always return RESULT_OK.\nBut, press cancel button and return RESULT_CANCELED"
         android:paddingBottom="8dp"/>
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Cancel"

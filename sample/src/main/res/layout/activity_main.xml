@@ -11,26 +11,26 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Detail Activity"
         android:onClick="startDetailActivity" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:id="@+id/btn_dagger"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Dagger Activity" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start And Occur ActivityNotFond"
         android:onClick="occurActivityNotFondException" />
 
-    <android.support.v7.widget.AppCompatButton
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start And Occur SecurityException"
