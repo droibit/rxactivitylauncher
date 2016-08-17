@@ -44,8 +44,8 @@ dependencies {
     compile project(':library')
 
     compile "com.android.support:appcompat-v7:$support_library_version"
-    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
-    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
+    compile 'io.reactivex:rxandroid:1.2.1'
 
     debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
     releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
