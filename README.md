@@ -4,9 +4,7 @@
 
 [RxPermissions](https://github.com/tbruyelle/RxPermissions) inspired me to make this library.
 
-
-
-When you receive the result start other activity, must use `Activity#onActivityResult(int, int, Bundle)` or `Fragment#onActivityResult(int, int, Bundle)`. 
+When you receive the result start other activity, must use `Activity#onActivityResult(int, int, Bundle)` or `Fragment#onActivityResult(int, int, Bundle)`.
 So, it is troublesome to receive result from the other activity. Library solves this problem by using the [RxJava](https://github.com/ReactiveX/RxJava).
 
 Supports the following classes.
@@ -17,15 +15,18 @@ Supports the following classes.
 
 ### Download
 
-Add the following code to build.gradle.
+Add the following code to `build.gradle`.
 
 ```
-repositories {
-    maven { url "https://jitpack.io" }
+allprojects {
+    repositories {
+        ...
+        maven { url "https://jitpack.io" }
+    }
 }
 
 dependencies {
-    compile 'com.github.droibit:rxactivitylauncher:0.3.0'
+    compile 'com.github.droibit:rxactivitylauncher:0.4.0'
 }
 ```
 
@@ -34,20 +35,26 @@ dependencies {
 ```java
 public class MainActivity extends AppCompatActivity {
 
-    // Get a singleton instance.
-    private RxLauncher mLauncher = RxLauncher.getInstance();
+    private RxActivityLauncher launcher = new RxActivityLauncher();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         // If the screen is rotated. Use RxBinding to trigger.
         // https://github.com/JakeWharton/RxBinding
         Observable<Void> trigger = RxView.clicks(findViewById(R.id.button))
-        mLauncher.from(this)
-                 .startActivityForResult(trigger, intent, REQUEST_ANY, null)
-                 .subscribe(result -> {
-                     // Do something.
+        launcher.from(this)
+                .on(trigger)
+                .startActivityForResult(trigger, intent, REQUEST_ANY, null)
+                .subscribe(result -> {
+                    // If you specify a trigger, even if an exception occurs onError it is not called.
+                    // So, the error handling in onNext.
+                    if (result.throwable != null) {
+                        // Error handling.
+                        return;
+                    }
+                    // Do something.
                  }
     }
 
@@ -55,19 +62,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // Always you must call the following #onActivityResult.
-        mLauncher.onActivityResult(requestCode, resultCode, data);
+        launcher.onActivityResult(requestCode, resultCode, data);
     }
 
     // In the case of explicit intent
     private void startActivityUsingExplicitIntent() {
       Intent intent = new Intent(this, AnyActivity.class);
-      mLauncher.from(this)
+      launcher.from(this)
                .startActivityForResult(intent, REQUEST_ANY, null)
                .subscribe(result -> {
                    if (result.isOk()) {
                        // Do in the case of RESULT_OK  
                    } else {
-                       // Do in the case of RESULT_CANCELD
+                       // Do in the case of RESULT_CANCELD etc.
                    }
                });
     }
@@ -75,33 +82,44 @@ public class MainActivity extends AppCompatActivity {
     // In the case of implicit intent
     private void startActivityUsingImplicitIntent() {
       Intent intent = new Intent(ANY_ACTION);
-      mLauncher.from(this)
+      launcher.from(this)
                .startActivityForResult(intent, REQUEST_ANY, null)
-               .subscribe(new Observer<ActivityResult>() {
-                    @Override public void onCompleted() {}
-
-                    @Override public void onError(Throwable e) {
-                        // Exception might occur in implicit Intent.
-                    }
-
-                    @Override public void onNext(ActivityResult result) {
-                         // Do in the case of received any result.
-                    }
-              });
+               .subscribe(new Action1<ActivityResult>() {
+                   @Override
+                   public void call(ActivityResult result) {
+                       // Do in the case of received any result.
+                   }
+               }, new Action1<Throwable>() {
+                   @Override
+                   public void call(Throwable throwable) {
+                       // Exception might occur in implicit Intent.
+                   }
+               });
     }
 }
 ```
 
 ### Change Log
 
+#### Version 0.4.0 *(2016-08-20)*
+
+**This version includes break change.**
+
+ * Changed the class name to the RxActivityLauncher from RxLauncher.
+ * It abolished the Singleton of RxActivityLauncher.
+   Usually, you will create an instance for each Activity(Fragment). If you want to use as a singleton, you should manage your own.
+ * Error handling when you are trigger use.
+
 #### Version 0.3.0 *(2016-01-21)*
- 
+
+**This version includes break change.**
+
  * Support the rotation of screen.  
-   This version includes a break change. When launch other activity, specify source component. 
+   When launch other activity, specify source component.
 
 ## License
 
-    Copyright 2015 droibit
+    Copyright 2016 Shinya Kumagai
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
