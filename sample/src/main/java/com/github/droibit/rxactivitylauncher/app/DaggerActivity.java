@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
-import com.github.droibit.rxactivitylauncher.RxLauncher;
+import com.github.droibit.rxactivitylauncher.RxActivityLauncher;
 import com.github.droibit.rxactivitylauncher.app.controller.DaggerController;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityComponent;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityModule;
@@ -16,7 +16,9 @@ import com.github.droibit.rxactivitylauncher.app.dagger.DaggerActivityComponent;
 
 import javax.inject.Inject;
 
+import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
 
@@ -32,10 +34,10 @@ public class DaggerActivity extends AppCompatActivity {
     }
 
     @Inject
-    RxLauncher mLauncher;
+    RxActivityLauncher activityLauncher;
 
     @Inject
-    DaggerController mController;
+    DaggerController controller;
 
     /** {@inheritDoc} */
     @Override
@@ -51,22 +53,24 @@ public class DaggerActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mLauncher.activityResult(requestCode, resultCode, data);
+        activityLauncher.onActivityResult(requestCode, resultCode, data);
     }
 
     public void startDetailActivity(View v) {
         final Intent intent = DetailActivity.launchIntent(this, false);
-        mLauncher.from(this).startActivityForResult(intent, REQUEST_DETAIL, null)
-                 .subscribe(new Action1<ActivityResult>() {
-                     @Override public void call(ActivityResult result) {
-                         final String msg = result.isOk() ? "OK" : "Canceled";
-                         Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
-                     }
+        activityLauncher.from(this)
+                .startActivityForResult(intent, REQUEST_DETAIL, null)
+                .subscribe(new Action1<ActivityResult>() {
+                    @Override
+                    public void call(ActivityResult result) {
+                        final String msg = result.isOk() ? "OK" : "Canceled";
+                        Toast.makeText(DaggerActivity.this, "Received: " + msg, Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
     public void startDetailActivityByController(View v) {
-        mController.startDetailActivity();
+        controller.startDetailActivity();
     }
 
     public void cancel(View v) {
