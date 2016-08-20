@@ -9,11 +9,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
-import com.github.droibit.rxactivitylauncher.RxLauncher;
+import com.github.droibit.rxactivitylauncher.RxActivityLauncher;
 import com.jakewharton.rxbinding.view.RxView;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -27,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_ERROR = 2;
 
-    private RxLauncher mLauncher;
-    private CompositeSubscription mCompositeSubscription;
+    private RxActivityLauncher activityLauncher;
 
     /** {@inheritDoc} */
     @Override
@@ -36,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mLauncher = RxLauncher.getInstance();
-        mCompositeSubscription = new CompositeSubscription();
+        activityLauncher = new RxActivityLauncher();
 
         startDetailActivity(findViewById(R.id.btn_detail));
         startDaggerActivity(findViewById(R.id.btn_dagger));
@@ -48,15 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        mLauncher.activityResult(requestCode, resultCode, data);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mCompositeSubscription.unsubscribe();
+        activityLauncher.onActivityResult(requestCode, resultCode, data);
     }
 
     public void startDetailActivity(View v) {
@@ -82,41 +73,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void launchActivity(Observable<Void> trigger, Intent intent, int requestCode) {
-        mCompositeSubscription.add(
-                mLauncher.from(this)
-                        .startActivityForResult(trigger, intent, requestCode, null)
-                        .subscribe(new Action1<ActivityResult>() {
-                            @Override
-                            public void call(ActivityResult result) {
-                                final String msg = result.isOk() ? "OK" : "Canceled";
-                                showToast("Received: " + msg);
-                                Log.d(BuildConfig.BUILD_TYPE, "Start Activity Result: " + msg);
-                            }
-                        })
-        );
+        activityLauncher.from(this)
+                .on(trigger)
+                .startActivityForResult(intent, requestCode, null)
+                .subscribe(new Action1<ActivityResult>() {
+                    @Override
+                    public void call(ActivityResult result) {
+                        final String msg = result.isOk() ? "OK" : "Canceled";
+                        showToast("Received: " + msg);
+                        Log.d(BuildConfig.BUILD_TYPE, "Start Activity Result: " + msg);
+                    }
+                });
     }
 
     private void occurException(Intent intent) {
-        mCompositeSubscription.add(
-                mLauncher.from(this)
-                        .startActivityForResult(intent, REQUEST_ERROR, null)
-                        .subscribe(new Observer<ActivityResult>() {
-                            @Override
-                            public void onCompleted() {
-                            }
+        activityLauncher.from(this)
+                .startActivityForResult(intent, REQUEST_ERROR, null)
+                .subscribe(new Action1<ActivityResult>() {
+                    @Override
+                    public void call(ActivityResult result) {
+                        final String msg = result.isOk() ? "OK" : "Canceled";
+                        showToast("Received: " + msg);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showToast("Error occur: " + throwable.getClass().getSimpleName());
+                    }
+                });
 
-                            @Override
-                            public void onError(Throwable e) {
-                                showToast("Error occur: " + e.getClass().getSimpleName());
-                            }
-
-                            @Override
-                            public void onNext(ActivityResult result) {
-                                final String msg = result.isOk() ? "OK" : "Canceled";
-                                showToast("Received: " + msg);
-                            }
-                        })
-        );
     }
 
     private void showToast(String msg) {

@@ -2,6 +2,7 @@ package com.github.droibit.rxactivitylauncher;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
@@ -12,12 +13,23 @@ import android.support.annotation.Nullable;
 public class ActivityResult {
 
     public final int resultCode;
+
     @Nullable
     public final Intent data;
+
+    @Nullable
+    public final Throwable throwable;
 
     ActivityResult(int resultCode, @Nullable Intent data) {
         this.resultCode = resultCode;
         this.data = data;
+        this.throwable = null;
+    }
+
+    ActivityResult(@NonNull Throwable throwable) {
+        this.resultCode = Integer.MIN_VALUE;
+        this.throwable = throwable;
+        this.data = null;
     }
 
     public boolean isOk() {
@@ -28,23 +40,32 @@ public class ActivityResult {
         return resultCode == Activity.RESULT_CANCELED;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ActivityResult)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ActivityResult)) {
+            return false;
+        }
 
         ActivityResult that = (ActivityResult) o;
 
-        if (resultCode != that.resultCode) return false;
-        return !(data != null ? !data.equals(that.data) : that.data != null);
+        if (resultCode != that.resultCode) {
+            return false;
+        }
+        //noinspection SimplifiableIfStatement
+        if (data != null ? !data.equals(that.data) : that.data != null) {
+            return false;
+        }
+        return throwable != null ? throwable.equals(that.throwable) : that.throwable == null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int result = resultCode;
         result = 31 * result + (data != null ? data.hashCode() : 0);
+        result = 31 * result + (throwable != null ? throwable.hashCode() : 0);
         return result;
     }
 }
