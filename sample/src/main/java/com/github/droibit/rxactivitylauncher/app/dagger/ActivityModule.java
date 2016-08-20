@@ -2,9 +2,7 @@ package com.github.droibit.rxactivitylauncher.app.dagger;
 
 import android.app.Activity;
 
-import com.github.droibit.rxactivitylauncher.RxLauncher;
-
-import javax.inject.Singleton;
+import com.github.droibit.rxactivitylauncher.RxActivityLauncher;
 
 import dagger.Module;
 import dagger.Provides;
@@ -16,28 +14,21 @@ import rx.subscriptions.CompositeSubscription;
 @Module
 public class ActivityModule {
 
-    private final Activity mActivity;
+    private final Activity activity;
 
     public ActivityModule(Activity activity) {
-        this.mActivity = activity;
+        this.activity = activity;
     }
 
     @Provides
     @PerActivity
     Activity activity() {
-        return mActivity;
+        return activity;
     }
 
     @Provides
     @PerActivity
-    CompositeSubscription provideCompositeSubscription() {
-        return new CompositeSubscription();
-    }
-
-    // FIXME:
-    @Provides
-    @PerActivity
-    RxLauncher provideRxLauncher() {
-        return RxLauncher.getInstance();
+    RxActivityLauncher provideRxLauncher() {
+        return new RxActivityLauncher();
     }
 }
