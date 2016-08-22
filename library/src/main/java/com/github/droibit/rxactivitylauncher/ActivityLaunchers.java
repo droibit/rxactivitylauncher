@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Action3;
 
 
@@ -17,6 +18,9 @@ import rx.functions.Action3;
  * @author kumagai
  */
 class ActivityLaunchers {
+
+    private ActivityLaunchers() {
+    }
 
     /**
      * Class to start another {@link Activity}.
@@ -137,5 +141,43 @@ class ActivityLaunchers {
             throw new NullPointerException();
         }
         return object;
+    }
+
+    /**
+     * Class to start another {@link Activity} from user defined {@link Action3}.
+     */
+    static class FromAction implements ActivityLaunchable, Action3<Intent, Integer, Bundle> {
+
+        private final RxActivityLauncher launcher;
+
+        private final Action1<Integer> action;
+
+        @Nullable
+        private Observable<?> trigger;
+
+        public FromAction(RxActivityLauncher launcher, Action1<Integer> action) {
+            this.launcher = launcher;
+            this.action = checkNotNull(action);
+        }
+
+        @Override
+        public ActivityLaunchable on(@NonNull Observable<?> trigger) {
+            this.trigger = checkNotNull(trigger);
+            return this;
+        }
+
+        @Override
+        public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
+                @Nullable Bundle options) {
+            if (trigger == null) {
+                return launcher.startActivityForResult(this, intent, requestCode, options);
+            }
+            return launcher.startActivityForResult(this, trigger, intent, requestCode, options);
+        }
+
+        @Override
+        public void call(@NonNull Intent intent, @NonNull Integer requestCode, @Nullable Bundle options) {
+            action.call(requestCode);
+        }
     }
 }

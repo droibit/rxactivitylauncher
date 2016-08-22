@@ -74,6 +74,14 @@ public class RxActivityLauncher {
     }
 
     /**
+     * Create new {@link ActivityLaunchable} from launch user defined {@link Action1} of other activity.
+     */
+    @CheckResult
+    public ActivityLaunchable from(@NonNull Action1<Integer> action) {
+        return new ActivityLaunchers.FromAction(this, action);
+    }
+
+    /**
      * Receive a result from the started activity.<br/>
      * Should call in any of the reference methods.
      *
