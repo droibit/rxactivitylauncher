@@ -26,7 +26,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.droibit:rxactivitylauncher:0.4.0'
+    compile 'com.github.droibit:rxactivitylauncher:0.4.1'
 }
 ```
 
@@ -101,12 +101,17 @@ public class MainActivity extends AppCompatActivity {
 
 ### Change Log
 
+#### Version 0.4.1 *(2016-08-22)*
+
+ * Added new method `RxActivityLauncher#from(Action1<Integer>)`.  
+   You can specify the launch user-defined action of activity.
+
 #### Version 0.4.0 *(2016-08-20)*
 
 **This version includes break change.**
 
  * Changed the class name to the RxActivityLauncher from RxLauncher.
- * It abolished the Singleton of RxActivityLauncher.
+ * It abolished the Singleton of RxActivityLauncher.  
    Usually, you will create an instance for each Activity(Fragment). If you want to use as a singleton, you should manage your own.
  * Error handling when you are trigger use.
 
