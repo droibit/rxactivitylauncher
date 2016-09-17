@@ -13,7 +13,7 @@ import rx.Observable;
  *
  * @author kumagai
  */
-public interface ActivityLaunchable {
+public interface LaunchActivitySource {
 
     /**
      * Specify the Observable that trigger.
@@ -21,12 +21,11 @@ public interface ActivityLaunchable {
      * @param trigger Observable that triggers the {@link #startActivityForResult(Intent, int, Bundle)}.
      */
     @CheckResult
-    ActivityLaunchable on(@NonNull Observable<?> trigger);
+    LaunchActivitySource on(@NonNull Observable<?> trigger);
 
     /**
      * Launch an activity for which you would like a result when it finished.
      */
     @CheckResult
-    Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
-            @Nullable Bundle options);
+    Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode, @Nullable Bundle options);
 }

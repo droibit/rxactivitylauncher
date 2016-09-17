@@ -45,40 +45,40 @@ public class RxActivityLauncher {
     }
 
     /**
-     * Create new {@link ActivityLaunchable} from launch source component({@link Activity}) of other activity.
+     * Create new {@link LaunchActivitySource} from launch source component({@link Activity}) of other activity.
      *
-     * @return New {@link @ActivityLaunchable} instance.
+     * @return New {@link @LaunchActivitySource} instance.
      */
     @CheckResult
-    public ActivityLaunchable from(@NonNull Activity source) {
-        return new ActivityLaunchers.FromActivity(this, source);
+    public LaunchActivitySource from(@NonNull Activity source) {
+        return new LaunchActivityFactory.FromActivity(this, source);
     }
 
     /**
-     * Create new {@link ActivityLaunchable} from l launch source component({@link android.support.v4.app.Fragment}) of other
+     * Create new {@link LaunchActivitySource} from l launch source component({@link android.support.v4.app.Fragment}) of other
      * activity.
      *
-     * @return New {@link @ActivityLaunchable} instance.
+     * @return New {@link @LaunchActivitySource} instance.
      */
     @CheckResult
-    public ActivityLaunchable from(@NonNull android.support.v4.app.Fragment source) {
-        return new ActivityLaunchers.FromSupportFragment(this, source);
+    public LaunchActivitySource from(@NonNull android.support.v4.app.Fragment source) {
+        return new LaunchActivityFactory.FromSupportFragment(this, source);
     }
 
     /**
-     * Create new {@link ActivityLaunchable} from launch source component({@link Fragment}) of other activity.
+     * Create new {@link LaunchActivitySource} from launch source component({@link Fragment}) of other activity.
      */
     @CheckResult
-    public ActivityLaunchable from(@NonNull Fragment source) {
-        return new ActivityLaunchers.FromFragment(this, source);
+    public LaunchActivitySource from(@NonNull Fragment source) {
+        return new LaunchActivityFactory.FromFragment(this, source);
     }
 
     /**
-     * Create new {@link ActivityLaunchable} from launch user defined {@link Action1} of other activity.
+     * Create new {@link LaunchActivitySource} from launch user defined {@link Action1} of other activity.
      */
     @CheckResult
-    public ActivityLaunchable from(@NonNull Action1<Integer> action) {
-        return new ActivityLaunchers.FromAction(this, action);
+    public LaunchActivitySource from(@NonNull Action1<Integer> action) {
+        return new LaunchActivityFactory.FromAction(this, action);
     }
 
     /**

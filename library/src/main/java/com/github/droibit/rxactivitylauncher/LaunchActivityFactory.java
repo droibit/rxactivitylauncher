@@ -13,19 +13,19 @@ import rx.functions.Action3;
 
 
 /**
- * Factory class of {@link ActivityLaunchable}.
+ * Factory class of {@link LaunchActivitySource}.
  *
  * @author kumagai
  */
-class ActivityLaunchers {
+class LaunchActivityFactory {
 
-    private ActivityLaunchers() {
+    private LaunchActivityFactory() {
     }
 
     /**
      * Class to start another {@link Activity}.
      */
-    static class FromActivity implements ActivityLaunchable, Action3<Intent, Integer, Bundle> {
+    static class FromActivity implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
 
         private final RxActivityLauncher launcher;
 
@@ -40,7 +40,7 @@ class ActivityLaunchers {
         }
 
         @Override
-        public ActivityLaunchable on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
@@ -63,7 +63,7 @@ class ActivityLaunchers {
     /**
      * Class to start another {@link Activity} from {@link Fragment}
      */
-    static class FromFragment implements ActivityLaunchable, Action3<Intent, Integer, Bundle> {
+    static class FromFragment implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
 
         private final RxActivityLauncher launcher;
 
@@ -78,7 +78,7 @@ class ActivityLaunchers {
         }
 
         @Override
-        public ActivityLaunchable on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
@@ -101,7 +101,7 @@ class ActivityLaunchers {
     /**
      * Class to start another {@link Activity} from {@link android.support.v4.app.Fragment}
      */
-    static class FromSupportFragment implements ActivityLaunchable, Action3<Intent, Integer, Bundle> {
+    static class FromSupportFragment implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
 
         private final RxActivityLauncher launcher;
 
@@ -116,7 +116,7 @@ class ActivityLaunchers {
         }
 
         @Override
-        public ActivityLaunchable on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
@@ -146,7 +146,7 @@ class ActivityLaunchers {
     /**
      * Class to start another {@link Activity} from user defined {@link Action3}.
      */
-    static class FromAction implements ActivityLaunchable, Action3<Intent, Integer, Bundle> {
+    static class FromAction implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
 
         private final RxActivityLauncher launcher;
 
@@ -161,7 +161,7 @@ class ActivityLaunchers {
         }
 
         @Override
-        public ActivityLaunchable on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
