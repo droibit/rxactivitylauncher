@@ -18,8 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity"></activity>
-        <activity android:name=".DaggerActivity"></activity>
+        <activity android:name=".DetailActivity" />
+        <activity android:name=".DaggerActivity" />
+        <activity android:name=".ListActivity"></activity>
     </application>
 
 </manifest>

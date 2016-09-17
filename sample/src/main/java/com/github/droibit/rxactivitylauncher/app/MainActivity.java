@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         launchActivity(RxView.clicks(v), intent, REQUEST_DAGGER);
     }
 
+    public void startListActivity(View v) {
+        startActivity(ListActivity.launchIntent(this));
+    }
+
     public void occurActivityNotFondException(View v) {
         final Intent intent = new Intent("test_action");
         occurException(intent);

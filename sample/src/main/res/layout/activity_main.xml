@@ -39,4 +39,11 @@
             android:onClick="occurSecurityException"
             android:text="Start And Occur SecurityException"
             />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="startListActivity"
+            android:text="Start List Activity"
+            />
 </LinearLayout>
