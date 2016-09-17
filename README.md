@@ -12,6 +12,7 @@ Supports the following classes.
 * Activity
 * Fragment
 * SupportFragment
+* Pending Action
 
 ### Download
 
@@ -26,7 +27,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.droibit:rxactivitylauncher:0.4.1'
+    compile 'com.github.droibit:rxactivitylauncher:0.5.0'
 }
 ```
 
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Observable<Void> trigger = RxView.clicks(findViewById(R.id.button))
         launcher.from(this)
                 .on(trigger)
-                .startActivityForResult(trigger, intent, REQUEST_ANY, null)
+                .startActivityForResult(intent, REQUEST_ANY, null)
                 .subscribe(result -> {
                     // If you specify a trigger, even if an exception occurs onError it is not called.
                     // So, the error handling in onNext.
@@ -100,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 ### Change Log
+
+#### Version 0.5.0 *(2016-09-17)*
+
+**This version includes break change.**
+
+* Changed from `RxActivityLauncher#from(Action1<Integer>)` to `RxActivityLauncher#from(PendingLaunchAction)`.
 
 #### Version 0.4.1 *(2016-08-22)*
 
