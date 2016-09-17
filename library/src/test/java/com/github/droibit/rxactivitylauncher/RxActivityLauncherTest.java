@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 
+import rx.functions.Action0;
 import rx.functions.Action3;
 import rx.observers.TestSubscriber;
 import rx.subjects.PublishSubject;
@@ -173,6 +174,36 @@ public class RxActivityLauncherTest {
         testSubscriber.assertNoErrors();
         testSubscriber.assertReceivedOnNext(asList(
                 new ActivityResult(exception),
+                new ActivityResult(RESULT_OK, null)
+        ));
+    }
+
+    @Test
+    public void startActivityForResult_fromAction() {
+        final RxActivityLauncher launcher = new RxActivityLauncher();
+
+        final PendingLaunchAction pendingLaunchAction = new PendingLaunchAction();
+
+        final TestSubscriber<ActivityResult> testSubscriber = TestSubscriber.create();
+        launcher.startActivityForResult(pendingLaunchAction.trigger, REQUEST_TEST_1)
+                .subscribe(testSubscriber);
+
+        final Action0 mockAction1 = mock(Action0.class);
+        pendingLaunchAction.invoke(mockAction1);
+        launcher.onActivityResult(REQUEST_TEST_1, RESULT_CANCELED, null);
+
+        testSubscriber.assertNoTerminalEvent();
+        testSubscriber.assertReceivedOnNext(singletonList(new ActivityResult(RESULT_CANCELED, null)));
+
+        verify(mockAction1).call();
+
+        final Action0 mockAction2 = mock(Action0.class);
+        pendingLaunchAction.invoke(mockAction2);
+        launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
+
+        testSubscriber.assertNoTerminalEvent();
+        testSubscriber.assertReceivedOnNext(asList(
+                new ActivityResult(RESULT_CANCELED, null),
                 new ActivityResult(RESULT_OK, null)
         ));
     }

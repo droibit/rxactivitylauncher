@@ -146,38 +146,20 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity} from user defined {@link Action3}.
      */
-    static class FromAction implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
+    static class FromAction implements PendingLaunchActivitySource {
 
         private final RxActivityLauncher launcher;
 
-        private final Action1<Integer> action;
+        private final PendingLaunchAction action;
 
-        @Nullable
-        private Observable<?> trigger;
-
-        public FromAction(RxActivityLauncher launcher, Action1<Integer> action) {
+        public FromAction(RxActivityLauncher launcher, PendingLaunchAction action) {
             this.launcher = launcher;
             this.action = checkNotNull(action);
         }
 
         @Override
-        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
-            this.trigger = checkNotNull(trigger);
-            return this;
-        }
-
-        @Override
-        public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
-                @Nullable Bundle options) {
-            if (trigger == null) {
-                return launcher.startActivityForResult(this, intent, requestCode, options);
-            }
-            return launcher.startActivityForResult(this, trigger, intent, requestCode, options);
-        }
-
-        @Override
-        public void call(@NonNull Intent intent, @NonNull Integer requestCode, @Nullable Bundle options) {
-            action.call(requestCode);
+        public Observable<ActivityResult> startActivityForResult(int requestCode) {
+            return launcher.startActivityForResult(action.trigger, requestCode);
         }
     }
 }

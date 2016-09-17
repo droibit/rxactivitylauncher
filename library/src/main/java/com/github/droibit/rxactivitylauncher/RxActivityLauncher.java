@@ -15,6 +15,7 @@ import java.util.Map;
 
 import rx.Observable;
 import rx.Subscription;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Action3;
 import rx.subjects.PublishSubject;
@@ -77,7 +78,7 @@ public class RxActivityLauncher {
      * Create new {@link LaunchActivitySource} from launch user defined {@link Action1} of other activity.
      */
     @CheckResult
-    public LaunchActivitySource from(@NonNull Action1<Integer> action) {
+    public PendingLaunchActivitySource from(@NonNull PendingLaunchAction action) {
         return new LaunchActivityFactory.FromAction(this, action);
     }
 
@@ -130,6 +131,26 @@ public class RxActivityLauncher {
             public void call(Object o) {
                 try {
                     launchActivityAction.call(intent, requestCode, options);
+                } catch (ActivityNotFoundException | SecurityException e) {
+                    subject.onNext(new ActivityResult(e));
+                }
+            }
+        });
+
+        if (compositeSubscription != null) {
+            compositeSubscription.add(subscription);
+        }
+        return subject;
+    }
+
+    Observable<ActivityResult> startActivityForResult(final Observable<Action0> trigger, int requestCode) {
+
+        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
+        final Subscription subscription = trigger.subscribe(new Action1<Action0>() {
+            @Override
+            public void call(Action0 action) {
+                try {
+                    action.call();
                 } catch (ActivityNotFoundException | SecurityException e) {
                     subject.onNext(new ActivityResult(e));
                 }
