@@ -1,6 +1,6 @@
 # RxActivityLauncher
 
-[![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE)  ![Jitpack.io](https://jitpack.io/v/droibit/rxactivitylauncher.svg)
+[![Build Status](https://travis-ci.org/droibit/rxactivitylauncher.svg?branch=develop)](https://travis-ci.org/droibit/rxactivitylauncher) [![Software License](https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg)](https://github.com/droibit/rxactivitylauncher/blob/develop/LICENSE) [![jitopack.io](https://jitpack.io/v/droibit/rxactivitylauncher.svg)](https://jitpack.io/#droibit/rxactivitylauncher)
 
 [RxPermissions](https://github.com/tbruyelle/RxPermissions) inspired me to make this library.
 
@@ -27,7 +27,7 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.github.droibit:rxactivitylauncher:0.5.0'
+    compile 'com.github.droibit:rxactivitylauncher:0.6.0'
 }
 ```
 
@@ -99,35 +99,6 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-
-### Change Log
-
-#### Version 0.5.0 *(2016-09-17)*
-
-**This version includes break change.**
-
-* Changed from `RxActivityLauncher#from(Action1<Integer>)` to `RxActivityLauncher#from(PendingLaunchAction)`.
-
-#### Version 0.4.1 *(2016-08-22)*
-
- * Added new method `RxActivityLauncher#from(Action1<Integer>)`.  
-   You can specify the launch user-defined action of activity.
-
-#### Version 0.4.0 *(2016-08-20)*
-
-**This version includes break change.**
-
- * Changed the class name to the RxActivityLauncher from RxLauncher.
- * It abolished the Singleton of RxActivityLauncher.  
-   Usually, you will create an instance for each Activity(Fragment). If you want to use as a singleton, you should manage your own.
- * Error handling when you are trigger use.
-
-#### Version 0.3.0 *(2016-01-21)*
-
-**This version includes break change.**
-
- * Support the rotation of screen.  
-   When launch other activity, specify source component.
 
 ## License
 
