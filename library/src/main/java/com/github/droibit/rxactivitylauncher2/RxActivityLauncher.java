@@ -47,8 +47,8 @@ public class RxActivityLauncher {
      */
     @NonNull
     @CheckResult
-    public LaunchActivitySource from(@NonNull Activity source) {
-        return new LaunchActivityFactory.FromActivity(this, source);
+    public LaunchActivitySource with(@NonNull Activity activity) {
+        return new LaunchActivityFactory.FromActivity(this, activity);
     }
 
     /**
@@ -60,8 +60,8 @@ public class RxActivityLauncher {
      */
     @NonNull
     @CheckResult
-    public LaunchActivitySource from(@NonNull android.support.v4.app.Fragment source) {
-        return new LaunchActivityFactory.FromSupportFragment(this, source);
+    public LaunchActivitySource with(@NonNull android.support.v4.app.Fragment fragment) {
+        return new LaunchActivityFactory.FromSupportFragment(this, fragment);
     }
 
     /**
@@ -69,8 +69,8 @@ public class RxActivityLauncher {
      */
     @NonNull
     @CheckResult
-    public LaunchActivitySource from(@NonNull Fragment source) {
-        return new LaunchActivityFactory.FromFragment(this, source);
+    public LaunchActivitySource with(@NonNull Fragment fragment) {
+        return new LaunchActivityFactory.FromFragment(this, fragment);
     }
 
     /**
@@ -78,7 +78,7 @@ public class RxActivityLauncher {
      */
     @NonNull
     @CheckResult
-    public PendingLaunchActivitySource from(@NonNull PendingLaunchAction action) {
+    public PendingLaunchActivitySource with(@NonNull PendingLaunchAction action) {
         return new LaunchActivityFactory.FromAction(this, action);
     }
 
