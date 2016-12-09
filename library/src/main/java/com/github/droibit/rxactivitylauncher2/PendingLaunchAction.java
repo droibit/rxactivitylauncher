@@ -2,15 +2,15 @@ package com.github.droibit.rxactivitylauncher2;
 
 import android.support.annotation.NonNull;
 
-import rx.functions.Action0;
-import rx.subjects.PublishSubject;
+import io.reactivex.functions.Action;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * If the activity of launch source is created from the later, to use this class.
  */
 public class PendingLaunchAction {
 
-    final PublishSubject<Action0> trigger = PublishSubject.create();
+    final PublishSubject<Action> trigger = PublishSubject.create();
 
     public PendingLaunchAction() {
     }
@@ -18,7 +18,7 @@ public class PendingLaunchAction {
     /**
      * Launch the activity from the specified action.
      */
-    public void invoke(@NonNull Action0 action) {
+    public void invoke(@NonNull Action action) {
         trigger.onNext(action);
     }
 }

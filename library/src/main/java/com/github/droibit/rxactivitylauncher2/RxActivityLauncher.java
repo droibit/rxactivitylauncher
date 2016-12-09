@@ -11,13 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v4.util.SparseArrayCompat;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Action3;
-import rx.subjects.PublishSubject;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Provide a way to receive the results of the {@link Activity} by RxJava.
@@ -30,15 +29,15 @@ public class RxActivityLauncher {
     private final SparseArrayCompat<Pair<PublishSubject<ActivityResult>, Boolean>> subjects;
 
     @Nullable
-    private final CompositeSubscription compositeSubscription;
+    private final CompositeDisposable compositeDisposable;
 
     public RxActivityLauncher() {
         this(null);
     }
 
-    public RxActivityLauncher(@Nullable CompositeSubscription compositeSubscription) {
+    public RxActivityLauncher(@Nullable CompositeDisposable compositeDisposable) {
         this.subjects = new SparseArrayCompat<>();
-        this.compositeSubscription = compositeSubscription;
+        this.compositeDisposable = compositeDisposable;
     }
 
     /**
@@ -53,7 +52,8 @@ public class RxActivityLauncher {
     }
 
     /**
-     * Create new {@link LaunchActivitySource} from l launch source component({@link android.support.v4.app.Fragment}) of other
+     * Create new {@link LaunchActivitySource} from l launch source component({@link android.support.v4.app.Fragment}) of
+     * other
      * activity.
      *
      * @return New {@link @LaunchActivitySource} instance.
@@ -74,7 +74,7 @@ public class RxActivityLauncher {
     }
 
     /**
-     * Create new {@link LaunchActivitySource} from launch user defined {@link Action1} of other activity.
+     * Create new {@link LaunchActivitySource} from launch user defined {@link Consumer} of other activity.
      */
     @NonNull
     @CheckResult
@@ -91,74 +91,75 @@ public class RxActivityLauncher {
      * @see android.support.v4.app.Fragment#onActivityResult(int, int, Intent)
      */
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        final Pair<PublishSubject<ActivityResult>, Boolean> triggerableSubject = subjects.get(requestCode);
-        if (triggerableSubject == null) {
+        final Pair<PublishSubject<ActivityResult>, Boolean> triggeredSubject = subjects.get(requestCode);
+        if (triggeredSubject == null) {
             return;
         }
 
-        final PublishSubject<ActivityResult> subject = triggerableSubject.first;
-        final boolean hasTrigger = triggerableSubject.second;
+        final PublishSubject<ActivityResult> subject = triggeredSubject.first;
+        final boolean hasTrigger = triggeredSubject.second;
         subject.onNext(new ActivityResult(resultCode, data));
 
         if (!hasTrigger) {
-            subject.onCompleted();
+            subject.onComplete();
             subjects.remove(requestCode);
         }
     }
 
     Observable<ActivityResult> startActivityForResult(
-            final Action3<Intent, Integer, Bundle> launchActivityAction,
+            final Consumer<Object[]> launchActivityAction,
             final Intent intent, final int requestCode, final Bundle options) {
 
         final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/false);
         try {
-            launchActivityAction.call(intent, requestCode, options);
+            launchActivityAction.accept(new Object[]{intent, requestCode, options});
             return subject;
         } catch (ActivityNotFoundException | SecurityException e) {
             subjects.remove(requestCode);
             return Observable.error(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     Observable<ActivityResult> startActivityForResult(
-            final Action3<Intent, Integer, Bundle> launchActivityAction,
-            final Observable<?> trigger,
+            final Consumer<Object[]> launchActivityAction,
+            final Observable<? super Object> trigger,
             final Intent intent, final int requestCode, final Bundle options) {
 
         final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
-        final Subscription subscription = trigger.subscribe(new Action1<Object>() {
+        final Disposable disposable = trigger.subscribe(new Consumer<Object>() {
             @Override
-            public void call(Object o) {
+            public void accept(Object ignored) throws Exception {
                 try {
-                    launchActivityAction.call(intent, requestCode, options);
+                    launchActivityAction.accept(new Object[]{intent, requestCode, options});
                 } catch (ActivityNotFoundException | SecurityException e) {
                     subject.onNext(new ActivityResult(e));
                 }
             }
         });
 
-        if (compositeSubscription != null) {
-            compositeSubscription.add(subscription);
+        if (compositeDisposable != null) {
+            compositeDisposable.add(disposable);
         }
         return subject;
     }
 
-    Observable<ActivityResult> startActivityForResult(final Observable<Action0> trigger, int requestCode) {
-
+    Observable<ActivityResult> startActivityForResult(final Observable<Action> trigger, int requestCode) {
         final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
-        final Subscription subscription = trigger.subscribe(new Action1<Action0>() {
+        final Disposable subscription = trigger.subscribe(new Consumer<Action>() {
             @Override
-            public void call(Action0 action) {
+            public void accept(Action action) throws Exception {
                 try {
-                    action.call();
+                    action.run();
                 } catch (ActivityNotFoundException | SecurityException e) {
                     subject.onNext(new ActivityResult(e));
                 }
             }
         });
 
-        if (compositeSubscription != null) {
-            compositeSubscription.add(subscription);
+        if (compositeDisposable != null) {
+            compositeDisposable.add(subscription);
         }
         return subject;
     }

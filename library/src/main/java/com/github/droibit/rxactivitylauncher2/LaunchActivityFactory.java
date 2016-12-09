@@ -1,7 +1,5 @@
 package com.github.droibit.rxactivitylauncher2;
 
-import com.github.droibit.rxactivitylauncher.ActivityResult;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -9,8 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import rx.Observable;
-import rx.functions.Action3;
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 
 
 /**
@@ -24,14 +22,14 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity}.
      */
-    static class FromActivity implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
+    static class FromActivity implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
         private final Activity activity;
 
         @Nullable
-        private Observable<?> trigger;
+        private Observable<? super Object> trigger;
 
         FromActivity(RxActivityLauncher launcher, Activity activity) {
             this.launcher = launcher;
@@ -39,11 +37,12 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<? super Object> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
 
+        @NonNull
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
@@ -54,22 +53,22 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public void call(@NonNull Intent intent, @NonNull Integer requestCode, @Nullable Bundle options) {
-            activity.startActivityForResult(intent, requestCode, options);
+        public void accept(Object[] objects) throws Exception {
+            activity.startActivityForResult(((Intent) objects[0]), ((int) objects[1]), ((Bundle) objects[2]));
         }
     }
 
     /**
      * Class to start another {@link Activity} from {@link Fragment}
      */
-    static class FromFragment implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
+    static class FromFragment implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
         private final Fragment fragment;
 
         @Nullable
-        private Observable<?> trigger;
+        private Observable<? super Object> trigger;
 
         FromFragment(RxActivityLauncher launcher, Fragment fragment) {
             this.launcher = launcher;
@@ -77,11 +76,12 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<? super Object> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
 
+        @NonNull
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
@@ -92,22 +92,22 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public void call(@NonNull Intent intent, @NonNull Integer requestCode, @Nullable Bundle options) {
-            fragment.startActivityForResult(intent, requestCode, options);
+        public void accept(@NonNull Object[] objects) throws Exception {
+            fragment.startActivityForResult(((Intent) objects[0]), ((int) objects[1]), ((Bundle) objects[2]));
         }
     }
 
     /**
      * Class to start another {@link Activity} from {@link android.support.v4.app.Fragment}
      */
-    static class FromSupportFragment implements LaunchActivitySource, Action3<Intent, Integer, Bundle> {
+    static class FromSupportFragment implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
         private final android.support.v4.app.Fragment fragment;
 
         @Nullable
-        private Observable<?> trigger;
+        private Observable<? super Object> trigger;
 
         FromSupportFragment(RxActivityLauncher launcher, android.support.v4.app.Fragment fragment) {
             this.launcher = launcher;
@@ -115,11 +115,12 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public LaunchActivitySource on(@NonNull Observable<?> trigger) {
+        public LaunchActivitySource on(@NonNull Observable<? super Object> trigger) {
             this.trigger = checkNotNull(trigger);
             return this;
         }
 
+        @NonNull
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
@@ -130,11 +131,12 @@ class LaunchActivityFactory {
         }
 
         @Override
-        public void call(@NonNull Intent intent, @NonNull Integer requestCode, @Nullable Bundle options) {
-            fragment.startActivityForResult(intent, requestCode, options);
+        public void accept(@NonNull Object[] objects) throws Exception {
+            fragment.startActivityForResult(((Intent) objects[0]), ((int) objects[1]), ((Bundle) objects[2]));
         }
     }
 
+    @NonNull
     private static <T> T checkNotNull(T object) {
         if (object == null) {
             throw new NullPointerException();
@@ -143,7 +145,7 @@ class LaunchActivityFactory {
     }
 
     /**
-     * Class to start another {@link Activity} from user defined {@link Action3}.
+     * Class to start another {@link Activity} from user defined {@link Consumer}.
      */
     static class FromAction implements PendingLaunchActivitySource {
 
@@ -151,11 +153,12 @@ class LaunchActivityFactory {
 
         private final PendingLaunchAction action;
 
-        public FromAction(RxActivityLauncher launcher, PendingLaunchAction action) {
+        FromAction(RxActivityLauncher launcher, PendingLaunchAction action) {
             this.launcher = launcher;
             this.action = checkNotNull(action);
         }
 
+        @NonNull
         @Override
         public Observable<ActivityResult> startActivityForResult(int requestCode) {
             return launcher.startActivityForResult(action.trigger, requestCode);
