@@ -9,16 +9,14 @@ import android.widget.Toast;
 
 import com.github.droibit.rxactivitylauncher.ActivityResult;
 import com.github.droibit.rxactivitylauncher.RxActivityLauncher;
-import com.github.droibit.rxactivitylauncher.app.controller.DaggerController;
+import com.github.droibit.rxactivitylauncher.app.dagger.DaggerController;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityComponent;
 import com.github.droibit.rxactivitylauncher.app.dagger.ActivityModule;
 import com.github.droibit.rxactivitylauncher.app.dagger.DaggerActivityComponent;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 
 import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
 

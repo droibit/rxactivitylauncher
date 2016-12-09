@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        dagger2Version = '2.0.2'
+        dagger2Version = '2.8'
         leakcanaryVersion = '1.5'
     }
     repositories {
@@ -37,6 +37,9 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
     }
 }
 

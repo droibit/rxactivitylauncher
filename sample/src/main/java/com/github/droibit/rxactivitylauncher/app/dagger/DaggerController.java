@@ -1,4 +1,4 @@
-package com.github.droibit.rxactivitylauncher.app.controller;
+package com.github.droibit.rxactivitylauncher.app.dagger;
 
 import android.app.Activity;
 import android.content.Intent;
