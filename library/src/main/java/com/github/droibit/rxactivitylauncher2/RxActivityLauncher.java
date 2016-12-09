@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.Pair;
 import android.support.v4.util.SparseArrayCompat;
 
@@ -106,6 +107,7 @@ public class RxActivityLauncher {
         }
     }
 
+    @VisibleForTesting
     Observable<ActivityResult> startActivityForResult(
             final Consumer<Object[]> launchActivityAction,
             final Intent intent, final int requestCode, final Bundle options) {
@@ -122,6 +124,7 @@ public class RxActivityLauncher {
         }
     }
 
+    @VisibleForTesting
     Observable<ActivityResult> startActivityForResult(
             final Consumer<Object[]> launchActivityAction,
             final Observable<? super Object> trigger,
