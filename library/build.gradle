@@ -28,9 +28,10 @@ android {
 }
 
 dependencies {
-    compile "com.android.support:support-v4:$support_library_version"
-    compile "com.android.support:support-annotations:$support_library_version"
-    compile "io.reactivex:rxjava:$rxjava_version"
+    compile "com.android.support:support-v4:$supportLibraryVersion"
+    compile "com.android.support:support-annotations:$supportLibraryVersion"
+    compile "io.reactivex:rxjava:$rxJavaVersion"
+    compile "io.reactivex.rxjava2:rxjava:$rxJava2Version"
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

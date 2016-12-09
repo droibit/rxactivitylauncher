@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        dagger2_version = '2.0.2'
-        leakcanary_version = '1.5'
+        dagger2Version = '2.0.2'
+        leakcanaryVersion = '1.5'
     }
     repositories {
         mavenCentral()
@@ -43,14 +43,14 @@ android {
 dependencies {
     compile project(':library')
 
-    compile "com.android.support:appcompat-v7:$support_library_version"
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'io.reactivex:rxandroid:1.2.1'
 
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
+    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanaryVersion"
 
-    compile "com.google.dagger:dagger:$dagger2_version"
-    apt "com.google.dagger:dagger-compiler:$dagger2_version"
+    compile "com.google.dagger:dagger:$dagger2Version"
+    apt "com.google.dagger:dagger-compiler:$dagger2Version"
     provided 'javax.annotation:jsr250-api:1.0'
 }
