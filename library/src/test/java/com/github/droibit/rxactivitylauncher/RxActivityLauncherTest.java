@@ -1,9 +1,10 @@
 package com.github.droibit.rxactivitylauncher;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -33,16 +34,14 @@ public class RxActivityLauncherTest {
 
     private static final int RESULT_CANCELED = 0;
 
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     @Mock
     Intent launchIntent;
 
     @Mock
     Action3<Intent, Integer, Bundle> launchAction;
-
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void startActivityForResult_noTrigger() {
