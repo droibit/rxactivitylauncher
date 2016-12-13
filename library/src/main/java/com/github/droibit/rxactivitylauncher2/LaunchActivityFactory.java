@@ -22,7 +22,7 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity}.
      */
-    static class FromActivity implements LaunchActivitySource, Consumer<Object[]> {
+    static class SourceActivity implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
@@ -31,7 +31,7 @@ class LaunchActivityFactory {
         @Nullable
         private Observable<? super Object> trigger;
 
-        FromActivity(RxActivityLauncher launcher, Activity activity) {
+        SourceActivity(RxActivityLauncher launcher, Activity activity) {
             this.launcher = launcher;
             this.activity = checkNotNull(activity);
         }
@@ -61,7 +61,7 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity} from {@link Fragment}
      */
-    static class FromFragment implements LaunchActivitySource, Consumer<Object[]> {
+    static class SourceFragment implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
@@ -70,7 +70,7 @@ class LaunchActivityFactory {
         @Nullable
         private Observable<? super Object> trigger;
 
-        FromFragment(RxActivityLauncher launcher, Fragment fragment) {
+        SourceFragment(RxActivityLauncher launcher, Fragment fragment) {
             this.launcher = launcher;
             this.fragment = checkNotNull(fragment);
         }
@@ -100,7 +100,7 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity} from {@link android.support.v4.app.Fragment}
      */
-    static class FromSupportFragment implements LaunchActivitySource, Consumer<Object[]> {
+    static class SourceSupportFragment implements LaunchActivitySource, Consumer<Object[]> {
 
         private final RxActivityLauncher launcher;
 
@@ -109,7 +109,7 @@ class LaunchActivityFactory {
         @Nullable
         private Observable<? super Object> trigger;
 
-        FromSupportFragment(RxActivityLauncher launcher, android.support.v4.app.Fragment fragment) {
+        SourceSupportFragment(RxActivityLauncher launcher, android.support.v4.app.Fragment fragment) {
             this.launcher = launcher;
             this.fragment = checkNotNull(fragment);
         }
@@ -147,13 +147,13 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity} from user defined {@link Consumer}.
      */
-    static class FromAction implements PendingLaunchActivitySource {
+    static class SourceAction implements PendingLaunchActivitySource {
 
         private final RxActivityLauncher launcher;
 
         private final PendingLaunchAction action;
 
-        FromAction(RxActivityLauncher launcher, PendingLaunchAction action) {
+        SourceAction(RxActivityLauncher launcher, PendingLaunchAction action) {
             this.launcher = launcher;
             this.action = checkNotNull(action);
         }

@@ -49,7 +49,7 @@ public class RxActivityLauncher {
     @NonNull
     @CheckResult
     public LaunchActivitySource with(@NonNull Activity activity) {
-        return new LaunchActivityFactory.FromActivity(this, activity);
+        return new LaunchActivityFactory.SourceActivity(this, activity);
     }
 
     /**
@@ -62,7 +62,7 @@ public class RxActivityLauncher {
     @NonNull
     @CheckResult
     public LaunchActivitySource with(@NonNull android.support.v4.app.Fragment fragment) {
-        return new LaunchActivityFactory.FromSupportFragment(this, fragment);
+        return new LaunchActivityFactory.SourceSupportFragment(this, fragment);
     }
 
     /**
@@ -71,7 +71,7 @@ public class RxActivityLauncher {
     @NonNull
     @CheckResult
     public LaunchActivitySource with(@NonNull Fragment fragment) {
-        return new LaunchActivityFactory.FromFragment(this, fragment);
+        return new LaunchActivityFactory.SourceFragment(this, fragment);
     }
 
     /**
@@ -80,7 +80,7 @@ public class RxActivityLauncher {
     @NonNull
     @CheckResult
     public PendingLaunchActivitySource with(@NonNull PendingLaunchAction action) {
-        return new LaunchActivityFactory.FromAction(this, action);
+        return new LaunchActivityFactory.SourceAction(this, action);
     }
 
     /**
@@ -148,6 +148,7 @@ public class RxActivityLauncher {
         return subject;
     }
 
+    @VisibleForTesting
     Observable<ActivityResult> startActivityForResult(final Observable<Action> trigger, int requestCode) {
         final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
         final Disposable subscription = trigger.subscribe(new Consumer<Action>() {
