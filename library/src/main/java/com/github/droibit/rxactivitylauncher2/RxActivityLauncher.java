@@ -79,7 +79,7 @@ public class RxActivityLauncher {
      */
     @NonNull
     @CheckResult
-    public PendingLaunchActivitySource with(@NonNull PendingLaunchAction action) {
+    public UserLaunchActivitySource with(@NonNull UserLaunchAction action) {
         return new LaunchActivityFactory.SourceAction(this, action);
     }
 

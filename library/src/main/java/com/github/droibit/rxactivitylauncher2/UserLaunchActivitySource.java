@@ -10,7 +10,7 @@ import io.reactivex.Observable;
 /**
  * Interface to delegate the launch of the activity.
  */
-public interface PendingLaunchActivitySource {
+public interface UserLaunchActivitySource {
 
     /**
      * Launch an activity for which you would like a result when it finished.

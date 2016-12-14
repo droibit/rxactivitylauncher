@@ -8,11 +8,11 @@ import io.reactivex.subjects.PublishSubject;
 /**
  * If the activity of launch source is created from the later, to use this class.
  */
-public class PendingLaunchAction {
+public class UserLaunchAction {
 
     final PublishSubject<Action> trigger = PublishSubject.create();
 
-    public PendingLaunchAction() {
+    public UserLaunchAction() {
     }
 
     /**

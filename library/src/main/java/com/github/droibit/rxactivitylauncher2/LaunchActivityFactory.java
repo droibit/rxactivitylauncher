@@ -147,13 +147,13 @@ class LaunchActivityFactory {
     /**
      * Class to start another {@link Activity} from user defined {@link Consumer}.
      */
-    static class SourceAction implements PendingLaunchActivitySource {
+    static class SourceAction implements UserLaunchActivitySource {
 
         private final RxActivityLauncher launcher;
 
-        private final PendingLaunchAction action;
+        private final UserLaunchAction action;
 
-        SourceAction(RxActivityLauncher launcher, PendingLaunchAction action) {
+        SourceAction(RxActivityLauncher launcher, UserLaunchAction action) {
             this.launcher = launcher;
             this.action = checkNotNull(action);
         }

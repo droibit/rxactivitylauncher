@@ -194,13 +194,13 @@ public class RxActivityLauncherTest {
     @Test
     public void startActivityForResult_fromAction() throws Exception {
         final RxActivityLauncher launcher = new RxActivityLauncher();
-        final PendingLaunchAction pendingLaunchAction = new PendingLaunchAction();
+        final UserLaunchAction userLaunchAction = new UserLaunchAction();
         final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(pendingLaunchAction.trigger, REQUEST_TEST_1)
+                .startActivityForResult(userLaunchAction.trigger, REQUEST_TEST_1)
                 .test();
 
         final Action mockAction1 = mock(Action.class);
-        pendingLaunchAction.invoke(mockAction1);
+        userLaunchAction.invoke(mockAction1);
         launcher.onActivityResult(REQUEST_TEST_1, RESULT_CANCELED, null);
 
         testObserver.assertNotTerminated()
@@ -208,7 +208,7 @@ public class RxActivityLauncherTest {
         verify(mockAction1).run();
 
         final Action mockAction2 = mock(Action.class);
-        pendingLaunchAction.invoke(mockAction2);
+        userLaunchAction.invoke(mockAction2);
         launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
 
 
