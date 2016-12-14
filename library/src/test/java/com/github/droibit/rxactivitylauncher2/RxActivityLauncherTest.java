@@ -48,7 +48,7 @@ public class RxActivityLauncherTest {
         final RxActivityLauncher launcher = new RxActivityLauncher();
 
         final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, launchIntent, REQUEST_TEST_1, null)
+                .startActivityForResult(launchAction, null, launchIntent, REQUEST_TEST_1, null)
                 .test();
 
         launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
@@ -164,7 +164,7 @@ public class RxActivityLauncherTest {
                 .when(launchAction).accept(((Object[]) any()));
 
         final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, launchIntent, REQUEST_TEST_1, null)
+                .startActivityForResult(launchAction, null, launchIntent, REQUEST_TEST_1, null)
                 .test();
 
         testObserver.assertError(ActivityNotFoundException.class)

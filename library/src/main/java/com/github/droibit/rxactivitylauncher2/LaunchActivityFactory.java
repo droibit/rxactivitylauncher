@@ -46,9 +46,6 @@ class LaunchActivityFactory {
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
-            if (trigger == null) {
-                return launcher.startActivityForResult(this, intent, requestCode, options);
-            }
             return launcher.startActivityForResult(this, trigger, intent, requestCode, options);
         }
 
@@ -85,9 +82,6 @@ class LaunchActivityFactory {
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
-            if (trigger == null) {
-                return launcher.startActivityForResult(this, intent, requestCode, options);
-            }
             return launcher.startActivityForResult(this, trigger, intent, requestCode, options);
         }
 
@@ -124,9 +118,6 @@ class LaunchActivityFactory {
         @Override
         public Observable<ActivityResult> startActivityForResult(@NonNull Intent intent, int requestCode,
                 @Nullable Bundle options) {
-            if (trigger == null) {
-                return launcher.startActivityForResult(this, intent, requestCode, options);
-            }
             return launcher.startActivityForResult(this, trigger, intent, requestCode, options);
         }
 

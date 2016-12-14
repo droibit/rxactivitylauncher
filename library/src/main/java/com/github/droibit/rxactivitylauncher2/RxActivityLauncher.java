@@ -109,33 +109,45 @@ public class RxActivityLauncher {
 
     @VisibleForTesting
     Observable<ActivityResult> startActivityForResult(
-            final Consumer<Object[]> launchActivityAction,
+            final Consumer<Object[]> launchAction,
+            @Nullable final Observable<? super Object> trigger,
             final Intent intent, final int requestCode, final Bundle options) {
 
-        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/false);
+        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(
+                requestCode, /*hasTrigger=*/trigger != null);
+        final Object[] args = {intent, requestCode, options};
+
+        if (trigger == null) {
+            return startActivityForResult(subject, launchAction, args);
+        }
+        return startActivityForResult(subject, launchAction, trigger, args);
+    }
+
+    private Observable<ActivityResult> startActivityForResult(
+            PublishSubject<ActivityResult> subject,
+            final Consumer<Object[]> launchAction,
+            final Object[] args) {
         try {
-            launchActivityAction.accept(new Object[]{intent, requestCode, options});
+            launchAction.accept(args);
             return subject;
         } catch (ActivityNotFoundException | SecurityException e) {
-            subjects.remove(requestCode);
+            subjects.remove(/*requestCode=*/((int) args[1]));
             return Observable.error(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    @VisibleForTesting
-    Observable<ActivityResult> startActivityForResult(
-            final Consumer<Object[]> launchActivityAction,
-            final Observable<? super Object> trigger,
-            final Intent intent, final int requestCode, final Bundle options) {
-
-        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
+    private Observable<ActivityResult> startActivityForResult(
+            final PublishSubject<ActivityResult> subject,
+            final Consumer<Object[]> launchAction,
+            Observable<? super Object> trigger,
+            final Object[] args) {
         final Disposable disposable = trigger.subscribe(new Consumer<Object>() {
             @Override
             public void accept(Object ignored) throws Exception {
                 try {
-                    launchActivityAction.accept(new Object[]{intent, requestCode, options});
+                    launchAction.accept(args);
                 } catch (ActivityNotFoundException | SecurityException e) {
                     subject.onNext(new ActivityResult(e));
                 }
