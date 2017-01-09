@@ -5,17 +5,14 @@ import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.Pair;
 import android.support.v4.util.SparseArrayCompat;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 
@@ -27,60 +24,30 @@ import io.reactivex.subjects.PublishSubject;
  */
 public class RxActivityLauncher {
 
-    private final SparseArrayCompat<Pair<PublishSubject<ActivityResult>, Boolean>> subjects;
+    private static class TriggeredSubject {
 
-    @Nullable
-    private final CompositeDisposable compositeDisposable;
+        final boolean hasTrigger;
 
-    public RxActivityLauncher() {
-        this(null);
+        final PublishSubject<ActivityResult> actual;
+
+        TriggeredSubject(boolean hasTrigger) {
+            this.hasTrigger = hasTrigger;
+            this.actual = PublishSubject.create();
+        }
     }
 
-    public RxActivityLauncher(@Nullable CompositeDisposable compositeDisposable) {
+    private final Consumer<Object[]> launchActivitySource;
+
+    private final SparseArrayCompat<TriggeredSubject> subjects;
+
+    public RxActivityLauncher(@NonNull Activity activity) {
+        this(LaunchActivitySourceFactory.create(activity));
+    }
+
+    @VisibleForTesting
+    RxActivityLauncher(final Consumer<Object[]> launchActivitySource) {
+        this.launchActivitySource = launchActivitySource;
         this.subjects = new SparseArrayCompat<>();
-        this.compositeDisposable = compositeDisposable;
-    }
-
-    /**
-     * Create new {@link LaunchActivitySource} from launch source component({@link Activity}) of other activity.
-     *
-     * @return New {@link @LaunchActivitySource} instance.
-     */
-    @NonNull
-    @CheckResult
-    public LaunchActivitySource with(@NonNull Activity activity) {
-        return new LaunchActivityFactory.SourceActivity(this, activity);
-    }
-
-    /**
-     * Create new {@link LaunchActivitySource} from l launch source component({@link android.support.v4.app.Fragment}) of
-     * other
-     * activity.
-     *
-     * @return New {@link @LaunchActivitySource} instance.
-     */
-    @NonNull
-    @CheckResult
-    public LaunchActivitySource with(@NonNull android.support.v4.app.Fragment fragment) {
-        return new LaunchActivityFactory.SourceSupportFragment(this, fragment);
-    }
-
-    /**
-     * Create new {@link LaunchActivitySource} from launch source component({@link Fragment}) of other activity.
-     */
-    @NonNull
-    @CheckResult
-    public LaunchActivitySource with(@NonNull Fragment fragment) {
-        return new LaunchActivityFactory.SourceFragment(this, fragment);
-    }
-
-    /**
-     * Create new {@link LaunchActivitySource} from launch user defined {@link Consumer} of other activity.
-     */
-    @NonNull
-    @CheckResult
-    public UserLaunchActivitySource with(@NonNull UserLaunchAction action) {
-        return new LaunchActivityFactory.SourceAction(this, action);
     }
 
     /**
@@ -92,101 +59,91 @@ public class RxActivityLauncher {
      * @see android.support.v4.app.Fragment#onActivityResult(int, int, Intent)
      */
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        final Pair<PublishSubject<ActivityResult>, Boolean> triggeredSubject = subjects.get(requestCode);
+        final TriggeredSubject triggeredSubject = subjects.get(requestCode);
         if (triggeredSubject == null) {
             return;
         }
-
-        final PublishSubject<ActivityResult> subject = triggeredSubject.first;
-        final boolean hasTrigger = triggeredSubject.second;
+        final PublishSubject<ActivityResult> subject = triggeredSubject.actual;
         subject.onNext(new ActivityResult(resultCode, data));
 
-        if (!hasTrigger) {
+        if (!triggeredSubject.hasTrigger) {
             subject.onComplete();
             subjects.remove(requestCode);
         }
     }
 
-    @VisibleForTesting
-    Observable<ActivityResult> startActivityForResult(
-            final Consumer<Object[]> launchAction,
-            @Nullable final Observable<? super Object> trigger,
-            final Intent intent, final int requestCode, final Bundle options) {
-
-        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(
-                requestCode, /*hasTrigger=*/trigger != null);
-        final Object[] args = {intent, requestCode, options};
-
-        if (trigger == null) {
-            return startActivityForResult(subject, launchAction, args);
-        }
-        return startActivityForResult(subject, launchAction, trigger, args);
-    }
-
-    private Observable<ActivityResult> startActivityForResult(
-            PublishSubject<ActivityResult> subject,
-            final Consumer<Object[]> launchAction,
-            final Object[] args) {
+    /**
+     * Launch an activity for which you would like a result when it finished.
+     */
+    @NonNull
+    public Observable<ActivityResult> start(@NonNull Intent intent, int requestCode, @Nullable Bundle options) {
         try {
-            launchAction.accept(args);
-            return subject;
+            launchActivitySource.accept(new Object[]{intent, requestCode, options});
         } catch (ActivityNotFoundException | SecurityException e) {
-            subjects.remove(/*requestCode=*/((int) args[1]));
             return Observable.error(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return createSubjectIfNotExist(requestCode, /*hasTrigger=*/false);
     }
 
-    private Observable<ActivityResult> startActivityForResult(
-            final PublishSubject<ActivityResult> subject,
-            final Consumer<Object[]> launchAction,
-            Observable<? super Object> trigger,
-            final Object[] args) {
-        final Disposable disposable = trigger.subscribe(new Consumer<Object>() {
+    /**
+     * Launch an activity for which you would like a result when it finished.
+     */
+    @NonNull
+    public <T> ObservableTransformer<T, ActivityResult> thenStart(@NonNull final Intent intent, final int requestCode,
+            @Nullable final Bundle options) {
+        return new ObservableTransformer<T, ActivityResult>() {
             @Override
-            public void accept(Object ignored) throws Exception {
-                try {
-                    launchAction.accept(args);
-                } catch (ActivityNotFoundException | SecurityException e) {
-                    subject.onNext(new ActivityResult(e));
-                }
+            public ObservableSource<ActivityResult> apply(Observable<T> trigger) {
+                final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
+                trigger.subscribe(new Consumer<Object>() {
+                    @Override
+                    public void accept(Object o) throws Exception {
+                        try {
+                            launchActivitySource.accept(new Object[]{intent, requestCode, options});
+                        } catch (ActivityNotFoundException | SecurityException e) {
+                            subject.onNext(new ActivityResult(e));
+                        }
+                    }
+                });
+                return subject;
             }
-        });
-
-        if (compositeDisposable != null) {
-            compositeDisposable.add(disposable);
-        }
-        return subject;
+        };
     }
 
-    @VisibleForTesting
-    Observable<ActivityResult> startActivityForResult(final Observable<Action> trigger, int requestCode) {
-        final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
-        final Disposable subscription = trigger.subscribe(new Consumer<Action>() {
+    /**
+     * Launch an activity for which you would like a result when it finished.
+     *
+     */
+    @NonNull
+    public ObservableTransformer<Consumer<Integer>, ActivityResult> thenStart(final int requestCode) {
+        return new ObservableTransformer<Consumer<Integer>, ActivityResult>() {
             @Override
-            public void accept(Action action) throws Exception {
-                try {
-                    action.run();
-                } catch (ActivityNotFoundException | SecurityException e) {
-                    subject.onNext(new ActivityResult(e));
-                }
+            public ObservableSource<ActivityResult> apply(Observable<Consumer<Integer>> trigger) {
+                final PublishSubject<ActivityResult> subject = createSubjectIfNotExist(requestCode, /*hasTrigger=*/true);
+                trigger.subscribe(new Consumer<Consumer<Integer>>() {
+                    @Override
+                    public void accept(Consumer<Integer> consumer) throws Exception {
+                        try {
+                            consumer.accept(requestCode);
+                        } catch (ActivityNotFoundException | SecurityException e) {
+                            subject.onNext(new ActivityResult(e));
+                        }
+                    }
+                });
+                return subject;
             }
-        });
-
-        if (compositeDisposable != null) {
-            compositeDisposable.add(subscription);
-        }
-        return subject;
+        };
     }
 
     private PublishSubject<ActivityResult> createSubjectIfNotExist(int requestCode, boolean hasTrigger) {
-        final Pair<PublishSubject<ActivityResult>, Boolean> targetSubject = subjects.get(requestCode);
-        if (targetSubject == null) {
-            final PublishSubject<ActivityResult> newSubject = PublishSubject.create();
-            subjects.put(requestCode, Pair.create(newSubject, hasTrigger));
-            return newSubject;
+        final TriggeredSubject existSubject = subjects.get(requestCode);
+        if (existSubject != null) {
+            return existSubject.actual;
         }
-        return targetSubject.first;
+        final TriggeredSubject newSubject = new TriggeredSubject(hasTrigger);
+        subjects.put(requestCode, newSubject);
+        return newSubject.actual;
     }
 }

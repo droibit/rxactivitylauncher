@@ -1,4 +1,4 @@
-package com.github.droibit.rxactivitylauncher3;
+package com.github.droibit.rxactivitylauncher2;
 
 
 import android.app.Activity;

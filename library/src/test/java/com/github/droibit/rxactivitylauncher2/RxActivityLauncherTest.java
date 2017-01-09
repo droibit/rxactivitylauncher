@@ -1,30 +1,25 @@
 package com.github.droibit.rxactivitylauncher2;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
+import com.github.droibit.rxactivitylauncher2.internal.Notification;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import io.reactivex.functions.Action;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subjects.PublishSubject;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.*;
 
 public class RxActivityLauncherTest {
-
-    private enum Notification {
-        INSTANCE
-    }
 
     private static final int REQUEST_TEST_1 = 1;
 
@@ -43,64 +38,70 @@ public class RxActivityLauncherTest {
     @Mock
     Consumer<Object[]> launchAction;
 
-    @Test
-    public void startActivityForResult_noTrigger() {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
+    private RxActivityLauncher launcher;
 
+    @Before
+    public void setUp() {
+        launcher = new RxActivityLauncher(launchAction);
+    }
+
+    @Test
+    public void start() {
         final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, null, launchIntent, REQUEST_TEST_1, null)
+                .start(launchIntent, REQUEST_TEST_1, null)
                 .test();
 
         launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
 
-        testObserver.assertComplete()
+        testObserver
                 .assertNoErrors()
+                .assertComplete()
                 .assertValue(new ActivityResult(RESULT_OK, null));
+
     }
 
     @Test
-    public void startActivityForResult_hasTrigger() {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
+    public void thenStart() {
         final PublishSubject<Object> trigger = PublishSubject.create();
-
-        final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, trigger, launchIntent, REQUEST_TEST_1, null)
+        final TestObserver<ActivityResult> testObserver = trigger
+                .compose(launcher.thenStart(launchIntent, REQUEST_TEST_1, null))
                 .test();
 
-        // first
+        // run first
         {
             trigger.onNext(Notification.INSTANCE);
             launcher.onActivityResult(REQUEST_TEST_1, RESULT_CANCELED, null);
 
             testObserver.assertNotTerminated()
-                .assertValue(new ActivityResult(RESULT_CANCELED, null));
+                    .assertValue(new ActivityResult(RESULT_CANCELED, null));
         }
 
-        // second
+        // run second
         {
-            trigger.onNext(Notification.INSTANCE);
-            launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
+            {
+                trigger.onNext(Notification.INSTANCE);
+                launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
 
-            testObserver.assertNotTerminated()
-                    .assertValues(
-                            new ActivityResult(RESULT_CANCELED, null),
-                            new ActivityResult(RESULT_OK, null)
-                    );
+                testObserver.assertNotTerminated()
+                        .assertValues(
+                                new ActivityResult(RESULT_CANCELED, null),
+                                new ActivityResult(RESULT_OK, null)
+                        );
+
+            }
         }
     }
 
     @Test
-    public void startActivityForResult_multipleRequests() {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
-
+    public void thenStart_multipleRequests() {
         final PublishSubject<Object> trigger1 = PublishSubject.create();
-        final TestObserver<ActivityResult> testObserver1 = launcher
-                .startActivityForResult(launchAction, trigger1, launchIntent, REQUEST_TEST_1, null)
+        final TestObserver<ActivityResult> testObserver1 = trigger1
+                .compose(launcher.thenStart(launchIntent, REQUEST_TEST_1, null))
                 .test();
 
         final PublishSubject<Object> trigger2 = PublishSubject.create();
-        final TestObserver<ActivityResult> testObserver2 = launcher
-                .startActivityForResult(launchAction, trigger2, launchIntent, REQUEST_TEST_2, null)
+        final TestObserver<ActivityResult> testObserver2 = trigger2
+                .compose(launcher.thenStart(launchIntent, REQUEST_TEST_2, null))
                 .test();
 
         // fire trigger1
@@ -127,96 +128,123 @@ public class RxActivityLauncherTest {
     }
 
     @Test
-    public void startActivityForResult_rotated() {
-        final RxActivityLauncher launcher1 = new RxActivityLauncher();
-
+    public void thenStart_rotated() {
+        final RxActivityLauncher launcher1 = new RxActivityLauncher(launchAction);
         final PublishSubject<Object> trigger1 = PublishSubject.create();
-        final TestObserver<ActivityResult> testObserver1 = launcher1
-                .startActivityForResult(launchAction, trigger1, launchIntent, REQUEST_TEST_1, null)
+        final TestObserver<ActivityResult> testObserver1 = trigger1
+                .compose(launcher.thenStart(launchIntent, REQUEST_TEST_1, null))
                 .test();
 
         // After launching the activity, screen is rotated.
         trigger1.onNext(Notification.INSTANCE);
-        testObserver1.assertNotTerminated()
+        testObserver1
+                .assertNotTerminated()
                 .assertNoValues();
 
         // Create new RxActivityLauncher.
-        final RxActivityLauncher launcher2 = new RxActivityLauncher();
+        final RxActivityLauncher launcher2 = new RxActivityLauncher(launchAction);
         final PublishSubject<Object> trigger2 = PublishSubject.create();
-        final TestObserver<ActivityResult> testObserver2 = launcher2
-                .startActivityForResult(launchAction, trigger2, launchIntent, REQUEST_TEST_1, null)
+        final TestObserver<ActivityResult> testObserver2 = trigger2
+                .compose(launcher2.thenStart(launchIntent, REQUEST_TEST_1, null))
                 .test();
 
         // A new RxActivityLauncher receives result of the start-up.
         launcher2.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
 
-        testObserver1.assertNotTerminated()
+        testObserver1
+                .assertNotTerminated()
                 .assertNoValues();
-        testObserver2.assertNotTerminated()
+        testObserver2
+                .assertNotTerminated()
                 .assertValue(new ActivityResult(RESULT_OK, null));
     }
 
     @Test
-    public void startActivityForResult_noTriggerWithError() throws Exception {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
+    public void start_occurError() throws Exception {
+        // Occur ActivityNotFoundException
+        {
+            doThrow(ActivityNotFoundException.class)
+                    .when(launchAction).accept(((Object[]) any()));
 
-        doThrow(ActivityNotFoundException.class)
-                .when(launchAction).accept(((Object[]) any()));
+            final TestObserver<ActivityResult> testObserver = launcher.start(launchIntent, REQUEST_TEST_1, null)
+                    .test();
 
-        final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, null, launchIntent, REQUEST_TEST_1, null)
-                .test();
+            testObserver
+                    .assertError(ActivityNotFoundException.class)
+                    .assertNotComplete()
+                    .assertNoValues();
+        }
 
-        testObserver.assertError(ActivityNotFoundException.class)
-                .assertNoValues()
-                .assertNotComplete();
+        // Occur SecurityException
+        {
+            doThrow(SecurityException.class)
+                    .when(launchAction).accept(((Object[]) any()));
+
+            final TestObserver<ActivityResult> testObserver = launcher.start(launchIntent, REQUEST_TEST_1, null)
+                    .test();
+
+            testObserver
+                    .assertError(SecurityException.class)
+                    .assertNotComplete()
+                    .assertNoValues();
+        }
     }
 
     @Test
-    public void startActivityForResult_hasTriggerWithError() throws Exception {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
-        final PublishSubject<Object> trigger = PublishSubject.create();
+    public void thenStart_occurError() throws Exception {
+        // Occur ActivityNotFoundException
+        {
+            final ActivityNotFoundException exception = new ActivityNotFoundException();
+            doThrow(exception)
+                    .when(launchAction).accept(((Object[]) any()));
 
-        final SecurityException exception = new SecurityException();
-        doThrow(exception).when(launchAction).accept(((Object[]) any()));
+            final PublishSubject<Object> trigger = PublishSubject.create();
+            final TestObserver<ActivityResult> testObserver = trigger
+                    .compose(launcher.thenStart(launchIntent, REQUEST_TEST_1, null))
+                    .test();
 
-        final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(launchAction, trigger, launchIntent, REQUEST_TEST_1, null)
-                .test();
+            trigger.onNext(Notification.INSTANCE);
 
-        trigger.onNext(Notification.INSTANCE);
+            testObserver
+                    .assertNotTerminated()
+                    .assertValue(new ActivityResult(exception));
+        }
 
-        testObserver.assertNoErrors()
-                .assertNotTerminated()
-                .assertValue(new ActivityResult(exception));
+        // Occur SecurityException
+        {
+            final SecurityException exception = new SecurityException();
+            doThrow(exception)
+                    .when(launchAction).accept(((Object[]) any()));
+
+            final PublishSubject<Object> trigger = PublishSubject.create();
+            final TestObserver<ActivityResult> testObserver = trigger
+                    .compose(launcher.thenStart(launchIntent, REQUEST_TEST_1, null))
+                    .test();
+
+            trigger.onNext(Notification.INSTANCE);
+
+            testObserver
+                    .assertNotTerminated()
+                    .assertValue(new ActivityResult(exception));
+        }
     }
 
     @Test
-    public void startActivityForResult_fromAction() throws Exception {
-        final RxActivityLauncher launcher = new RxActivityLauncher();
-        final UserLaunchAction userLaunchAction = new UserLaunchAction();
-        final TestObserver<ActivityResult> testObserver = launcher
-                .startActivityForResult(userLaunchAction.trigger, REQUEST_TEST_1)
+    public void thenStart_usingPendingLaunchAction() {
+        final PendingLaunchAction pendingLaunchAction = new PendingLaunchAction();
+        final TestObserver<ActivityResult> testObserver = pendingLaunchAction.asObservable()
+                .compose(launcher.thenStart(REQUEST_TEST_1))
                 .test();
 
-        final Action mockAction1 = mock(Action.class);
-        userLaunchAction.invoke(mockAction1);
+        //noinspection unchecked
+        final Consumer<Integer> mockConsumer = (Consumer<Integer>) mock(Consumer.class);
+        pendingLaunchAction.invoke(mockConsumer);
+
         launcher.onActivityResult(REQUEST_TEST_1, RESULT_CANCELED, null);
 
-        testObserver.assertNotTerminated()
+        testObserver
+                .assertNotTerminated()
                 .assertValue(new ActivityResult(RESULT_CANCELED, null));
-        verify(mockAction1).run();
 
-        final Action mockAction2 = mock(Action.class);
-        userLaunchAction.invoke(mockAction2);
-        launcher.onActivityResult(REQUEST_TEST_1, RESULT_OK, null);
-
-
-        testObserver.assertNotTerminated()
-                .assertValues(
-                        new ActivityResult(RESULT_CANCELED, null),
-                        new ActivityResult(RESULT_OK, null)
-                );
-        verify(mockAction2).run();
     }
 }

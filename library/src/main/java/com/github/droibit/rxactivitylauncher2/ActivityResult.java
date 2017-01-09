@@ -18,13 +18,13 @@ public class ActivityResult {
     @Nullable
     public final Throwable throwable;
 
-    ActivityResult(int resultCode, @Nullable Intent data) {
+    public ActivityResult(int resultCode, @Nullable Intent data) {
         this.resultCode = resultCode;
         this.data = data;
         this.throwable = null;
     }
 
-    ActivityResult(@NonNull Throwable throwable) {
+    public ActivityResult(@NonNull Throwable throwable) {
         this.resultCode = Integer.MIN_VALUE;
         this.throwable = throwable;
         this.data = null;
@@ -65,5 +65,14 @@ public class ActivityResult {
         result = 31 * result + (data != null ? data.hashCode() : 0);
         result = 31 * result + (throwable != null ? throwable.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ActivityResult{" +
+                "resultCode=" + resultCode +
+                ", data=" + data +
+                ", throwable=" + throwable +
+                '}';
     }
 }

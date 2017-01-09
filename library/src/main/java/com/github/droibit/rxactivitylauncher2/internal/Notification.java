@@ -1,4 +1,4 @@
-package com.github.droibit.rxactivitylauncher3.internal;
+package com.github.droibit.rxactivitylauncher2.internal;
 
 import android.support.annotation.RestrictTo;
 

@@ -1,7 +1,7 @@
-package com.github.droibit.rxactivitylauncher.app;
+package com.github.droibit.rxactivitylauncher2.app;
 
-import com.github.droibit.rxactivitylauncher3.ActivityResult;
-import com.github.droibit.rxactivitylauncher3.RxActivityLauncher;
+import com.github.droibit.rxactivitylauncher2.ActivityResult;
+import com.github.droibit.rxactivitylauncher2.RxActivityLauncher;
 import com.jakewharton.rxbinding.view.RxView;
 
 import android.content.Intent;
@@ -16,7 +16,7 @@ import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.functions.Consumer;
 import rx.functions.Func1;
 
-import static com.github.droibit.rxactivitylauncher.app.DetailActivity.REQUEST_DETAIL;
+import static com.github.droibit.rxactivitylauncher2.app.DetailActivity.REQUEST_DETAIL;
 
 /**
  * @author kumagai

@@ -1,4 +1,4 @@
-package com.github.droibit.rxactivitylauncher.app;
+package com.github.droibit.rxactivitylauncher2.app;
 
 import android.app.Application;
 
@@ -9,7 +9,6 @@ import com.squareup.leakcanary.LeakCanary;
  */
 public class MyApplication extends Application {
 
-    /** {@inheritDoc} */
     @Override
     public void onCreate() {
         super.onCreate();

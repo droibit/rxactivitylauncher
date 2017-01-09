@@ -1,4 +1,4 @@
-package com.github.droibit.rxactivitylauncher.app;
+package com.github.droibit.rxactivitylauncher2.app;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,13 +16,14 @@ import static android.content.Intent.EXTRA_TEXT;
 public class DetailActivity extends AppCompatActivity {
 
     public static final int REQUEST_DETAIL = 1;
+
     public static final String KEY_RESPONSE_MSG = "response_msg";
 
     private static final String EXTRA_REQUEST_MSG = "request_msg";
 
     public static Intent launchIntent(Context context, boolean requestAppendMsg) {
-       return new Intent(context, DetailActivity.class)
-               .putExtra(EXTRA_REQUEST_MSG, requestAppendMsg);
+        return new Intent(context, DetailActivity.class)
+                .putExtra(EXTRA_REQUEST_MSG, requestAppendMsg);
     }
 
     public static Intent launchIntent(Context context, boolean requestAppendMsg, String text) {

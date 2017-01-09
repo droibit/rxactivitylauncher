@@ -1,8 +1,8 @@
-package com.github.droibit.rxactivitylauncher.app;
+package com.github.droibit.rxactivitylauncher2.app;
 
-import com.github.droibit.rxactivitylauncher3.ActivityResult;
-import com.github.droibit.rxactivitylauncher3.PendingLaunchAction;
-import com.github.droibit.rxactivitylauncher3.RxActivityLauncher;
+import com.github.droibit.rxactivitylauncher2.ActivityResult;
+import com.github.droibit.rxactivitylauncher2.PendingLaunchAction;
+import com.github.droibit.rxactivitylauncher2.RxActivityLauncher;
 
 import android.content.Context;
 import android.content.Intent;

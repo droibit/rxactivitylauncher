@@ -3,7 +3,6 @@
 buildscript {
     ext {
         supportLibraryVersion = '25.1.0'
-        rxJavaVersion = '1.1.9'
         rxJava2Version = '2.0.3'
     }
 
