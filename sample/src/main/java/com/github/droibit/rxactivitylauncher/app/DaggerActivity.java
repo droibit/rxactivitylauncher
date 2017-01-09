@@ -37,7 +37,6 @@ public class DaggerActivity extends AppCompatActivity {
     @Inject
     DaggerController controller;
 
-    /** {@inheritDoc} */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +45,6 @@ public class DaggerActivity extends AppCompatActivity {
         component().inject(this);
     }
 
-    /** {@inheritDoc} */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

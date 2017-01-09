@@ -1,13 +1,13 @@
 package com.github.droibit.rxactivitylauncher.app;
 
-import com.github.droibit.rxactivitylauncher.ActivityResult;
-import com.github.droibit.rxactivitylauncher.PendingLaunchAction;
-import com.github.droibit.rxactivitylauncher.RxActivityLauncher;
+import com.github.droibit.rxactivitylauncher3.ActivityResult;
+import com.github.droibit.rxactivitylauncher3.PendingLaunchAction;
+import com.github.droibit.rxactivitylauncher3.RxActivityLauncher;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,8 +15,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import rx.functions.Action0;
-import rx.functions.Action1;
+import io.reactivex.functions.Consumer;
+
 
 public class ListActivity extends AppCompatActivity implements
         AdapterView.OnItemClickListener {
@@ -39,12 +39,12 @@ public class ListActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        activityLauncher = new RxActivityLauncher();
-        activityLauncher.from(pendingLaunchAction)
-                .startActivityForResult(REQUEST_DETAIL)
-                .subscribe(new Action1<ActivityResult>() {
+        activityLauncher = new RxActivityLauncher(this);
+        pendingLaunchAction.asObservable()
+                .compose(activityLauncher.thenStart(REQUEST_DETAIL))
+                .subscribe(new Consumer<ActivityResult>() {
                     @Override
-                    public void call(ActivityResult result) {
+                    public void accept(ActivityResult result) throws Exception {
                         final String msg = result.isOk() ? "OK" : "Canceled";
                         showToast("Received: " + msg);
                         Log.d(BuildConfig.BUILD_TYPE, "Start Activity Result: " + msg);
@@ -66,11 +66,12 @@ public class ListActivity extends AppCompatActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        //noinspection ConstantConditions
         final String item = adapter.getItem(position).toString();
-        pendingLaunchAction.invoke(new Action0() {
+        pendingLaunchAction.invoke(new Consumer<Integer>() {
             @Override
-            public void call() {
-                startActivityForResult(DetailActivity.launchIntent(ListActivity.this, false, item), REQUEST_DETAIL);
+            public void accept(Integer requestCode) throws Exception {
+                startActivityForResult(DetailActivity.launchIntent(ListActivity.this, false, item), requestCode);
             }
         });
     }

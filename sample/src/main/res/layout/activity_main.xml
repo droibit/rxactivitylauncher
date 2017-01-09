@@ -24,6 +24,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Start Dagger Activity"
+            android:onClick="startDaggerActivity"
+            />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="startListActivity"
+            android:text="Start List Activity"
             />
 
     <Button
@@ -38,12 +46,5 @@
             android:layout_height="wrap_content"
             android:onClick="occurSecurityException"
             android:text="Start And Occur SecurityException"
-            />
-
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="startListActivity"
-            android:text="Start List Activity"
             />
 </LinearLayout>

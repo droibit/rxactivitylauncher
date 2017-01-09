@@ -31,7 +31,6 @@ public class DetailActivity extends AppCompatActivity {
                 .putExtra(EXTRA_TEXT, text);
     }
 
-    /** {@inheritDoc} */
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
