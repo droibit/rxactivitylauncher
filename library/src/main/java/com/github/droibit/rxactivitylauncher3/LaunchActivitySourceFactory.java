@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RestrictTo;
+import android.support.v4.app.ActivityCompat;
 
 import io.reactivex.functions.Consumer;
 
@@ -24,7 +25,7 @@ final class LaunchActivitySourceFactory {
         return new Consumer<Object[]>() {
             @Override
             public void accept(Object[] objects) throws Exception {
-                activity.startActivityForResult(((Intent) objects[0]), ((int) objects[1]), ((Bundle) objects[2]));
+                ActivityCompat.startActivityForResult(activity, ((Intent) objects[0]), ((int) objects[1]), ((Bundle) objects[2]));
             }
         };
     }
