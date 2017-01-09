@@ -1,5 +1,16 @@
 ## Change Log
 
+### Version 2.0.0-beta1 *(2017-01-10)*
+
+**This version includes break change.**
+
+* Support RxJava2.
+ * Does not support RxJava 1.x from this version.
+* Changed the package.
+ * `com.github.droibit.rxactivitylauncher2`
+* Abolished `RxActivityLauncher#from`.
+* Launch of Activity with Trigger uses `Observable#compose`.
+
 ### Version 0.6.0 *(2016-10-26)*
 
 * Update targetSdkVersion to '24'
