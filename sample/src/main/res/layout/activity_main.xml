@@ -20,14 +20,6 @@
             />
 
     <Button
-            android:id="@+id/btn_dagger"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Start Dagger Activity"
-            android:onClick="startDaggerActivity"
-            />
-
-    <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="startListActivity"

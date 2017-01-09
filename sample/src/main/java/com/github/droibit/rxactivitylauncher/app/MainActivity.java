@@ -64,10 +64,6 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void startDaggerActivity(View v) {
-        startActivity(DaggerActivity.launchIntent(this));
-    }
-
     public void startListActivity(View v) {
         startActivity(ListActivity.launchIntent(this));
     }

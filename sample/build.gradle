@@ -1,18 +1,4 @@
-buildscript {
-    ext {
-        dagger2Version = '2.8'
-        leakcanaryVersion = '1.5'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
-}
-
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -50,10 +36,6 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
     compile "com.github.akarnokd:rxjava2-interop:0.8.1"
 
-    debugCompile "com.squareup.leakcanary:leakcanary-android:$leakcanaryVersion"
-    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanaryVersion"
-
-    compile "com.google.dagger:dagger:$dagger2Version"
-    apt "com.google.dagger:dagger-compiler:$dagger2Version"
-    provided 'javax.annotation:jsr250-api:1.0'
+    debugCompile "com.squareup.leakcanary:leakcanary-android:1.5"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:1.5"
 }
