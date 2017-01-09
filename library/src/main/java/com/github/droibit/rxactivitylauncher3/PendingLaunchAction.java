@@ -20,8 +20,8 @@ public class PendingLaunchAction {
     /**
      * Launch the activity from the specified action.
      */
-    public void invoke(@NonNull Consumer<Integer> action) {
-        trigger.onNext(action);
+    public void invoke(@NonNull Consumer<Integer> consumer) {
+        trigger.onNext(consumer);
     }
 
     public Observable<Consumer<Integer>> asObservable() {

@@ -73,7 +73,7 @@ public class RxActivityLauncherTest {
             launcher.onActivityResult(REQUEST_TEST_1, RESULT_CANCELED, null);
 
             testObserver.assertNotTerminated()
-                    .assertValue(new ActivityResult(RESULT_CANCELED, null));
+                .assertValue(new ActivityResult(RESULT_CANCELED, null));
         }
 
         // second
@@ -140,7 +140,7 @@ public class RxActivityLauncherTest {
         testObserver1.assertNotTerminated()
                 .assertNoValues();
 
-        // A new RxActivityLauncher is created.
+        // Create new RxActivityLauncher.
         final RxActivityLauncher launcher2 = new RxActivityLauncher();
         final PublishSubject<Object> trigger2 = PublishSubject.create();
         final TestObserver<ActivityResult> testObserver2 = launcher2
